@@ -37,12 +37,12 @@ const Home = () => {
           {/* Potential Students Dropdown */}
           <div className={styles.featureGroup}>
             <h3 onClick={togglePotential} className={styles.dropdownHeader}>
-              <FontAwesomeIcon icon={faChevronDown} className={styles.dropdownIcon} />
-              For Potential Students
+              <FontAwesomeIcon icon={faChevronDown} className={styles.dropdownIcon} />  
+            For Potential Students
             </h3>
             {potentialVisible && (
               <ul className={styles.dropdownContent}>
-                <li><FontAwesomeIcon icon={faCheckCircle} className={styles.icon} /> Explore top coding bootcamps</li>
+                <li><FontAwesomeIcon icon={faCheckCircle} className={styles.icon} /> Explore coding bootcamps and find out what others think about it</li>
                 <li><FontAwesomeIcon icon={faCheckCircle} className={styles.icon} /> Compare options and curricula</li>
                 <li><FontAwesomeIcon icon={faCheckCircle} className={styles.icon} /> Get expert advice to start your journey in tech</li>
               </ul>
@@ -77,6 +77,17 @@ const Home = () => {
                 <li><FontAwesomeIcon icon={faCheckCircle} className={styles.icon} /> Stay connected with the bootcamp community</li>
               </ul>
             )}
+          </div>
+        </div>
+      </section>
+      <section className={styles.signUpLogin}>
+        <div className={styles.container}>
+          <h2>Get Started Today</h2>
+          <p>Join Bootcamp Hub to connect with fellow students and alumni, access exclusive resources, and take the next step in your coding career.</p>
+
+          <div className={styles.join}>
+            <Link to="/register" className={styles.joinLink}>Sign Up</Link>
+            <Link to="/login" className={styles.joinLink}>Log In</Link>
           </div>
         </div>
       </section>
