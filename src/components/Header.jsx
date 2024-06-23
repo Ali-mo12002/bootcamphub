@@ -9,7 +9,6 @@ const Header = () => {
       <div className={styles.container}>
         <Link to="/" className={styles.logo}>Bootcamp Hub</Link>
         <nav className={styles.nav}>
-          <Link to="/bootcamps" className={styles.navLink}>Bootcamps</Link>
           <Link to="/login" className={styles.navLink}>Login</Link>
           <Link to="/register" className={styles.navLink}>Register</Link>
         </nav>
