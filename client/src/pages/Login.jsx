@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Header from '../components/Header'; // Adjust path as needed
 import styles from '../styles/register.module.css'; // Adjust path as needed
 
+import Auth from '../utils/auth'; // Adjust the path based on your project structure
 
 
 const LOGIN_USER = gql`
@@ -37,7 +38,7 @@ const Login = () => {
           password: formData.password,
         },
       });
-      localStorage.setItem('token', data.login.token);
+      Auth.login(data.login.token);
       navigate('/'); // Redirect to home page after successful login
     } catch (error) {
       console.error('Login error:', error);
