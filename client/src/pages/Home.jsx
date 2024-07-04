@@ -18,8 +18,14 @@ const Home = () => {
     event.preventDefault();
     Auth.logout();
   };
-
+  let username = ''
+  if(Auth.loggedIn()){
+  const user = Auth.getProfile();
+  console.log(user.data.username);
+  username = user.data.username
+  }
   return (
+    <>
     <div className={styles.home}>
       {Auth.loggedIn() ? (
         <>
@@ -31,8 +37,8 @@ const Home = () => {
           {/* Empty content when logged in */}
           <section className={styles.emptyContent}>
             <div className={styles.container}>
-              <h2>Welcome!</h2>
-              <p>You are logged in. Theres nothing to show on the home page.</p>
+              <h2>Welcome!, {username} </h2>
+              
               
             </div>
           </section>
@@ -113,7 +119,9 @@ const Home = () => {
         </>
       )}
     </div>
+    </>
   );
+  
 };
 
 export default Home;

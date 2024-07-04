@@ -1,19 +1,32 @@
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+const { signToken } = require('../../utils/auth');
 const User = require('../../models/User');
 const dotenv = require('dotenv');
+const jwt = require('jsonwebtoken');
+
 
 dotenv.config();
 
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: '30d',
-  });
-};
+
 
 const authResolvers = {
   Query: {
-    hello: () => 'Hello, world!',
+    me: async (_, __, context) => {
+      if (!context.user) {
+        throw new Error('you need to be logged in');
+      }
+
+      try {
+        
+        const user = await User.findById(context.user._id);
+        if (!user) {
+          throw new Error('User not found');
+        }
+        return user;
+      } catch (error) {
+        throw new Error('Invalid token');
+      }
+    },
   },
   Mutation: {
     register: async (_, { registerInput: { username, email, password, userStatus } }) => {
@@ -51,9 +64,9 @@ const authResolvers = {
         if (!user) {
           throw new Error('Invalid email or password');
         }
-        console.log(email);
-        console.log(await bcrypt.hash(password, 10));
-        console.log(user.password);
+  
+
+
         // Check if password matches
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
@@ -61,15 +74,11 @@ const authResolvers = {
         }
         
         // Generate JWT token
-        const token = generateToken(user._id);
+        const token = signToken(user);
+        console.log('ss', user);
+        return {token, user };
 
-        return {
-          id: user._id,
-          username: user.username,
-          email: user.email,
-          userStatus: user.userStatus,
-          token,
-        };
+
       } catch (error) {
         console.error('Error logging in user:', error);
         throw new Error('Login failed');

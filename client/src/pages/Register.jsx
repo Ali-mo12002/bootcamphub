@@ -1,6 +1,6 @@
 // src/pages/Register.jsx
 
-import React, { useState } from 'react';
+import  { useState } from 'react';
 import { useMutation, gql } from '@apollo/client';
 import { Link, useNavigate } from 'react-router-dom';
 import Header from '../components/Header'; // Assuming you have a Header component

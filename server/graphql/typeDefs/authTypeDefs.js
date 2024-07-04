@@ -22,7 +22,7 @@ const authTypeDefs = gql`
   }
 
   type Query {
-    hello: String
+    me: User
   }
 
   type Mutation {

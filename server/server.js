@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 const { ApolloServer } = require('apollo-server-express');
 const connectDB = require('./config/db');
 const { typeDefs, resolvers } = require('./graphql/schema');
+const { authMiddleware } = require('./utils/auth');
 
 dotenv.config();
 
@@ -12,8 +13,10 @@ connectDB();
 // Create an instance of ApolloServer
 const server = new ApolloServer({
   typeDefs,
-  resolvers
+  resolvers,
+  context: authMiddleware
 });
+
 
 // Initialize Express app
 const app = express();

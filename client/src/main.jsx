@@ -1,22 +1,44 @@
 // src/index.jsx
+import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client'; // Import ApolloClient and ApolloProvider
 import App from './App.jsx';
 import './index.css';
+import Home from './pages/Home';
+import Bootcamps from './pages/Bootcamps'; 
+import Login from './pages/Login'; 
+import Register from './pages/Register'; 
+import GettingStarted from './pages/GettingStarted';
 
-// Create an ApolloClient instance
-const client = new ApolloClient({
-  uri: 'http://localhost:5000/graphql', // Replace with your GraphQL endpoint
-  cache: new InMemoryCache(),
-});
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <App />,
+    errorElement: <h1 className='display-2'>Wrong page!</h1>,
+    children: [
+      {
+        index: true,
+        element: <Home />
+      }, {
+        path: '/bootcamps',
+        element: <Bootcamps />
+      }, {
+        path: '/login',
+        element: <Login />
+      }, {
+        path: '/register',
+        element: <Register />
+      }, {
+        path: '/getting-started',
+        element: <GettingStarted />
+      }
+    ]
+  }
+])
 
 // Render your app using ReactDOM.createRoot
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <ApolloProvider client={client}> 
-      <App />
-    </ApolloProvider>
-  </React.StrictMode>
+  <RouterProvider router={router} />
+
 );
