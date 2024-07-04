@@ -32,7 +32,8 @@ const Home = () => {
           <section className={styles.emptyContent}>
             <div className={styles.container}>
               <h2>Welcome!</h2>
-              <p>You are logged in. There's nothing to show on the home page.</p>
+              <p>You are logged in. Theres nothing to show on the home page.</p>
+              
             </div>
           </section>
         </>

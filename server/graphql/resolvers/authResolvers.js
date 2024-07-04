@@ -27,7 +27,7 @@ const authResolvers = {
         // Hash the password
 
         // Create new user
-        const newUser = await User.create({
+        const user = await User.create({
           username,
           email,
           password,
@@ -35,15 +35,9 @@ const authResolvers = {
         });
 
         // Generate JWT token
-        const token = generateToken(newUser._id);
+        const token = signToken(user);
 
-        return {
-          id: newUser._id,
-          username: newUser.username,
-          email: newUser.email,
-          userStatus: newUser.userStatus,
-          token,
-        };
+        return {token, user };
       } catch (error) {
         console.error('Error registering user:', error);
         throw new Error('Registration failed');

@@ -5,11 +5,12 @@ import { useMutation, gql } from '@apollo/client';
 import { Link, useNavigate } from 'react-router-dom';
 import Header from '../components/Header'; // Assuming you have a Header component
 import styles from '../styles/register.module.css'; // Example styling module
-
+import Auth from '../utils/auth'
 const REGISTER_USER = gql`
   mutation Register($username: String!, $email: String!, $password: String!, $userStatus: String!) {
     register(registerInput: { username: $username, email: $email, password: $password, userStatus: $userStatus }) {
       token
+      
     }
   }
 `;
@@ -43,8 +44,10 @@ const Register = () => {
           userStatus: formData.userStatus,
         },
       });
-      localStorage.setItem('token', data.register.token);
+      const { token } = data.register;
       // Optionally redirect to another page after successful registration
+      Auth.login(token);
+
       navigate('/'); // Redirect to home page
     } catch (error) {
       console.error('Registration error:', error);
