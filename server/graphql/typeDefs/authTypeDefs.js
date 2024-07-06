@@ -8,6 +8,18 @@ const authTypeDefs = gql`
     userStatus: String!
     token: String
   }
+type Provider {
+  id: ID
+  name: String
+  location: String
+  website: String
+}
+
+input ProviderInput {
+  name: String!
+  location: String
+  website: String
+}
 
   input RegisterInput {
     username: String!
@@ -23,10 +35,12 @@ const authTypeDefs = gql`
 
   type Query {
     me: User
+    getProviders: [Provider]!
   }
 
   type Mutation {
     register(registerInput: RegisterInput): User!
+    createProvider(input: ProviderInput!): Provider!
     login(loginInput: LoginInput): User!
   }
 `;

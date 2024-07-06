@@ -8,3 +8,11 @@ export const GET_USER = gql`
     }
   }
 `;
+export const GET_PROVIDERS = gql`
+  query GetProviders {
+    getProviders {
+      id
+      name
+    }
+  }
+`;

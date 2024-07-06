@@ -1,19 +1,13 @@
 import  { useState } from 'react';
-import { useMutation, gql } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { Link, useNavigate } from 'react-router-dom';
 import Header from '../components/Header'; // Adjust path as needed
 import styles from '../styles/register.module.css'; // Adjust path as needed
-
+import { LOGIN_USER } from '../utils/mutations'; // Assuming you have a LOGIN_USER query defined
 import Auth from '../utils/auth'; // Adjust the path based on your project structure
 
 
-const LOGIN_USER = gql`
-  mutation Login($email: String!, $password: String!) {
-    login(loginInput: { email: $email, password: $password }) {
-      token
-    }
-  }
-`;
+
 const Login = () => {
   const [formData, setFormData] = useState({
     email: '',

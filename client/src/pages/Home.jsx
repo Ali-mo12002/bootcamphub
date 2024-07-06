@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import  { useState } from 'react';
 import styles from '../styles/home.module.css'; // CSS Modules
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -19,9 +19,8 @@ const Home = () => {
     Auth.logout();
   };
   let username = ''
-  if(Auth.loggedIn()){
+  if(Auth.loggedIn() === true){
   const user = Auth.getProfile();
-  console.log(user.data.username);
   username = user.data.username
   }
   return (

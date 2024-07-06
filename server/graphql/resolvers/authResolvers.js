@@ -3,7 +3,7 @@ const { signToken } = require('../../utils/auth');
 const User = require('../../models/User');
 const dotenv = require('dotenv');
 const jwt = require('jsonwebtoken');
-
+const Provider = require('../../models/Provider');
 
 dotenv.config();
 
@@ -25,6 +25,14 @@ const authResolvers = {
         return user;
       } catch (error) {
         throw new Error('Invalid token');
+      }
+    },
+    getProviders: async () => {
+      try {
+        const providers = await Provider.find();
+        return providers;
+      } catch (error) {
+        throw new Error(`Failed to fetch providers: ${error.message}`);
       }
     },
   },
@@ -82,6 +90,29 @@ const authResolvers = {
       } catch (error) {
         console.error('Error logging in user:', error);
         throw new Error('Login failed');
+      }
+    },
+    createProvider: async (_, { input:{ name, location, website } }) => {
+      try {
+
+        // Check if provider already exists
+        let provider = await Provider.findOne({ name });
+        if (provider) {
+          throw new Error('Provider already exists');
+        }
+
+        // Create new provider
+        provider = await Provider.create({
+          name,
+          location,
+          website,
+        });
+
+        // Save provider to database
+        const savedProvider = await provider.save();
+        return savedProvider;
+      } catch (error) {
+        throw new Error(`Failed to create provider: ${error.message}`);
       }
     },
   },

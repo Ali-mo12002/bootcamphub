@@ -1,19 +1,13 @@
 // src/pages/Register.jsx
 
 import  { useState } from 'react';
-import { useMutation, gql } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { Link, useNavigate } from 'react-router-dom';
 import Header from '../components/Header'; // Assuming you have a Header component
 import styles from '../styles/register.module.css'; // Example styling module
 import Auth from '../utils/auth'
-const REGISTER_USER = gql`
-  mutation Register($username: String!, $email: String!, $password: String!, $userStatus: String!) {
-    register(registerInput: { username: $username, email: $email, password: $password, userStatus: $userStatus }) {
-      token
-      
-    }
-  }
-`;
+import { REGISTER_USER } from '../utils/mutations'; // Assuming you have a LOGIN_USER query defined
+
 
 const Register = () => {
   const [formData, setFormData] = useState({

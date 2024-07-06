@@ -11,14 +11,23 @@ class AuthService {
   // return `true` or `false` if token exists (does not verify if it's expired yet)
   loggedIn() {
     const token = this.getToken();
-    return token ? true : false;
+    return !!token && !this.isTokenExpired(token); // handwaiving here
   }
 
   getToken() {
     // Retrieves the user token from localStorage
     return localStorage.getItem('id_token');
   }
-
+  isTokenExpired(token) {
+    try {
+      const decoded = decode(token);
+      if (decoded.exp < Date.now() / 1000) {
+        return true;
+      } else return false;
+    } catch (err) {
+      return false;
+    }
+  }
   login(idToken) {
     // Saves user token to localStorage and reloads the application for logged in status to take effect
     localStorage.setItem('id_token', idToken);
