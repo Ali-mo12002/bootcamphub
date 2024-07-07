@@ -38,12 +38,11 @@ label {
   font-size: 20px;
 }
 
-input,
-select {
+input {
   width: 98%;
   padding: 8px 0;
   margin-bottom: 10px;
-  border: 1px solid #007bff;
+  border: 1px solid hsl(0, 0%, 80%);
   background-color: white;
   color: black;
   border-radius: 4px;
@@ -61,12 +60,19 @@ button {
 button:hover {
   background-color: #0056b3; /* Darker shade of primary color */
 }
+.customSelect__option--is-selected {
+  background-color: black;
+  color: white;
+  width: 98%;
+}
 
 input:focus,
 select:focus{
   outline: none;
 }
-
+option{
+  color: black;
+}
 .formNavigation {
   display: flex;
   justify-content: space-between;
@@ -77,4 +83,9 @@ select:focus{
   width: 120px;
 }
 
+
+
+.selectReact {
+width: 98%;
+}
 

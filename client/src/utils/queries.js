@@ -16,3 +16,14 @@ export const GET_PROVIDERS = gql`
     }
   }
 `;
+export const GET_COURSES_BY_PROVIDER_ID = gql`
+  query GetCoursesByProvider($providerId: ID!) {
+    getCoursesByProvider(providerId: $providerId) {
+      id
+      name
+      deliveryMode
+      schedule
+      cost
+    }
+  }
+`;
