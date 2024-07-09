@@ -142,3 +142,6 @@
   color: black;
   text-decoration: none;
 }
+.emptyContent{
+  display: flex;
+}

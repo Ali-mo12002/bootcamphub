@@ -5,7 +5,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import Auth from '../utils/auth'; // Adjust the path based on your project structure
 import Header from '../components/Header'
- 
+import Sidebar from '../components/Sidebar'
+
 const Home = () => {
   const [potentialVisible, setPotentialVisible] = useState(false);
   const [currentVisible, setCurrentVisible] = useState(false);
@@ -26,16 +27,17 @@ const Home = () => {
   }
   return (
     <>
-      <Header/>
     <div className={styles.home}>
       {Auth.loggedIn() ? (
         <>
-
+      <Header/>
           
           {/* Empty content when logged in */}
           <section className={styles.emptyContent}>
+          <Sidebar/>
+
             <div className={styles.container}>
-              <h2>Welcome!, {username} </h2>
+              <h2></h2>
               
               
             </div>

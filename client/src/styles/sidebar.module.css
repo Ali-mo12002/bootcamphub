@@ -1,0 +1,47 @@
+/* Set the height of the sidebar to full height of the viewport */
+.sidebar {
+    height: 100vh;
+    width: 20%;
+    background-color: #2b2a2a; /* Light background color */
+    border-right: 2px solid #1c1c1c; /* Light border color */
+    border-top: 2px solid #1c1c1c; /* Light border color */
+  }
+  
+  /* Style the sidebar items */
+  .sidebar .sidebaritems {
+    padding-top: 20px;
+  }
+  
+  .sidebar .sidebaritemgroup {
+    margin-bottom: 10px;
+    list-style: none;
+    padding: 0;
+  }
+  
+  .sidebar .sidebaritem {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    border-radius: 5px;
+    transition: background-color 0.2s ease;
+    color: white; /* Dark text color */
+    text-decoration: none; /* Remove underline from links */
+    background-color: #2b2a2a;
+  }
+  .sidebar ul{
+    background-color: #2b2a2a;
+  }
+  .sidebar .sidebaritem:hover {
+    background-color: #e5e7eb; /* Light hover background color */
+  }
+  
+  .sidebar .sidebaritem .icon {
+    margin-right: 10px;
+  }
+  
+  /* Style the active sidebar item */
+  .sidebar .sidebaritem.active {
+    background-color: #d1d5db; /* Darker background color for active item */
+    font-weight: bold; /* Bold text for active item */
+  }
+  
