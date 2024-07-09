@@ -6,6 +6,8 @@ const authTypeDefs = gql`
     username: String!
     email: String!
     userStatus: String!
+    graduationDate: String
+    courseId: ID
     token: String
   }
 
@@ -24,6 +26,16 @@ const authTypeDefs = gql`
     schedule: String!
     cost: Float!
   }
+
+  type Review {
+  id: ID!
+  courseId: ID!
+  curriculumRating: Int!
+  instructorRating: Int!
+  supportRating: Int!
+  overallRating: Int!
+  feedback: String!
+}
 
   input ProviderInput {
     name: String!
@@ -51,6 +63,11 @@ const authTypeDefs = gql`
     password: String!
   }
 
+  input UpdateGradInfoInput {
+    graduationDate: String!
+    courseId: ID!
+  }
+
   type Query {
     me: User
     getProviders: [Provider]!
@@ -62,6 +79,9 @@ const authTypeDefs = gql`
     createProvider(input: ProviderInput!): Provider!
     createCourse(input: CourseInput!): Course!
     login(loginInput: LoginInput): User!
+    updateGradInfo(updateGradInfoInput: UpdateGradInfoInput): User!
+    submitReview(courseId: ID!, curriculumRating: Int!, instructorRating: Int!, supportRating: Int!, overallRating: Int!, feedback: String!): Review
+
   }
 `;
 

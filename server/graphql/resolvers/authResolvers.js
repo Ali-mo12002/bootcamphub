@@ -3,6 +3,7 @@ const { signToken } = require('../../utils/auth');
 const User = require('../../models/User');
 const Provider = require('../../models/Provider');
 const Course = require('../../models/Course');
+const Review = require('../../models/Review');
 const dotenv = require('dotenv');
 const jwt = require('jsonwebtoken');
 
@@ -113,6 +114,35 @@ const authResolvers = {
       } catch (error) {
         throw new Error(`Failed to create course: ${error.message}`);
       }
+    },
+    updateGradInfo: async (_, { updateGradInfoInput }, { user }) => {
+      if (!user) {
+        throw new Error('Authentication required');
+      }
+
+      const updatedUser = await User.findByIdAndUpdate(
+        user.id,
+        {
+          graduationDate: updateGradInfoInput.graduationDate,
+          courseId: updateGradInfoInput.courseId,
+        },
+        { new: true }
+      );
+
+      return updatedUser;
+    },
+    submitReview: async (_, { courseId, curriculumRating, instructorRating, supportRating, overallRating, feedback }, context) => {
+      // Assuming you have a Review model
+      const review = await Review.create({
+        courseId,
+        curriculumRating,
+        instructorRating,
+        supportRating,
+        overallRating,
+        feedback,
+      });
+
+      return review;
     },
   },
 };

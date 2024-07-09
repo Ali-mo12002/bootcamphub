@@ -1,20 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
+import { Navigate, useNavigate } from 'react-router-dom';
+
 import { GET_USER, GET_PROVIDERS, GET_COURSES_BY_PROVIDER_ID } from '../utils/queries'; // Adjust the path based on your project structure
-import { CREATE_PROVIDER, CREATE_COURSE } from '../utils/mutations'; // Adjust the path based on your project structure
+import { CREATE_PROVIDER, CREATE_COURSE, UPDATE_GRAD_INFO, SUBMIT_REVIEW } from '../utils/mutations'; // Adjust the path based on your project structure
 import Rating from 'react-rating-stars-component';
 import styles from '../styles/getStarted.module.css'; // Ensure you have corresponding CSS
 import Select from 'react-select';
 
 const GetStarted = () => {
-  // Query to fetch user data
   const { loading: userLoading, error: userError, data: userData } = useQuery(GET_USER);
-  // Query to fetch providers data
   const { loading: providersLoading, error: providersError, data: providersData } = useQuery(GET_PROVIDERS);
   const [createProvider] = useMutation(CREATE_PROVIDER);
   const [createCourse] = useMutation(CREATE_COURSE);
- 
-  // State variables
+  const [updateGradInfo] = useMutation(UPDATE_GRAD_INFO);
+  const [submitReview] = useMutation(SUBMIT_REVIEW);
+
   const [step, setStep] = useState(0);
   const [city, setCity] = useState('');
   const [bootcampType, setBootcampType] = useState('');
@@ -29,28 +30,27 @@ const GetStarted = () => {
   const [curriculumRating, setCurriculumRating] = useState(0);
   const [instructorRating, setInstructorRating] = useState(0);
   const [supportRating, setSupportRating] = useState(0);
-  const [overallReview, setOverallReview] = useState(0);
-  const [overallFeedback, setOverallFeedback] = useState('');
+  const [overallRating, setOverallRating] = useState(0);
+  const [feedback, setFeedback] = useState('');
   const [providerCreated, setProviderCreated] = useState(false);
   const [courseCreated, setCourseCreated] = useState(false);
-  const [fetchCourses, setFetchCourses] = useState(false); // State to determine if courses should be fetched
-  const [courses, setCourses] = useState([]); // State to hold courses fetched for a provider
+  const [fetchCourses, setFetchCourses] = useState(false);
+  const [courses, setCourses] = useState([]);
   const [selectedOption, setSelectedOption] = useState(null);
+  const [graduationDate, setGraduationDate] = useState('');
+  const [bootcampId, setBootcampId] = useState(0); // Use state for bootcampId
 
-  // Queries
   const { loading: coursesLoading, error: coursesError, data: coursesData } = useQuery(GET_COURSES_BY_PROVIDER_ID, {
     variables: { providerId: bootcampProviderId },
     skip: !fetchCourses,
   });
 
-  // Effect to update courses when fetchCourses or coursesData changes
   useEffect(() => {
     if (bootcampProviderId && bootcampProviderId !== 'other' && coursesData && coursesData.getCoursesByProvider) {
       setCourses(coursesData.getCoursesByProvider);
     }
   }, [coursesData, bootcampProviderId]);
 
-  // Effect to manage fetchCourses state
   useEffect(() => {
     if (step === 1 && bootcampProviderId === 'other') {
       setFetchCourses(false);
@@ -59,7 +59,6 @@ const GetStarted = () => {
     }
   }, [step, bootcampProviderId]);
 
-  // Handle form submission for creating provider
   const handleSubmitProvider = async (event) => {
     event.preventDefault();
 
@@ -80,7 +79,6 @@ const GetStarted = () => {
     }
   };
 
-  // Handle form submission for creating course
   const handleSubmitCourse = async (event) => {
     event.preventDefault();
 
@@ -97,7 +95,6 @@ const GetStarted = () => {
 
       console.log('Created course:', result.data.createCourse);
       setCourseCreated(true);
-      setStep((prevStep) => prevStep + 1); // Move to next step after creating course
     } catch (error) {
       console.error('Error creating course:', error);
     }
@@ -106,63 +103,87 @@ const GetStarted = () => {
     setSelectedOption(selectedOption);
     if (step === 1 && bootcampProviderId && bootcampProviderId !== 'other') {
       setBootcampName(selectedOption.value);
-    }
-    else{
-    setBootcampProviderId(selectedOption.value); // Update bootcampProviderId with selected option's value
+      setBootcampId(selectedOption.value);
+      console.log(bootcampId);
+
+    } else {
+      setBootcampProviderId(selectedOption.value);
     }
     console.log('Selected :', selectedOption);
+  };
 
-  };
-  // Handle form submission for final review and submit
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log({
-      userStatus: userData.me.userStatus,
-      city,
-      bootcampType,
-      bootcampName,
-      bootcampProviderId,
-      deliveryMode,
-      schedule,
-      cost,
-      curriculumRating,
-      instructorRating,
-      supportRating,
-      overallReview,
-      overallFeedback,
-    });
-    // Additional logic to handle form submission (e.g., send data to backend)
+
+    try {
+      const result = await updateGradInfo({
+        variables: {
+          graduationDate: graduationDate,
+          courseId: selectedOption.value,
+        },
+      });
+
+      console.log('Updated grad info:', result.data.updateGradInfo);
+
+      // After updating grad info, proceed to review submission
+    } catch (error) {
+      console.error('Error updating grad info:', error);
+    }
   };
-  if (userLoading) return <p>Loading...</p>;
+  const navigate = useNavigate();
+
+  const handleSubmitReview = async (event) => {
+    event.preventDefault();
+
+    try {
+      console.log(overallRating);
+      console.log(bootcampId)
+      const result = await submitReview({
+        variables: {
+          courseId: bootcampId,
+          curriculumRating: curriculumRating,
+          instructorRating: instructorRating,
+          supportRating: supportRating,
+          overallRating: overallRating,
+          feedback: feedback,
+        },
+      });
+
+      console.log('Submitted review:', result.data.submitReview);
+      navigate('/')
+      // Additional logic for post-submit action
+    } catch (error) {
+      console.error('Error submitting review:', error);
+    }
+  };
+
+  if (userLoading || providersLoading || coursesLoading) return <p>Loading...</p>;
   if (userError) return <p>Error: {userError.message}</p>;
-  if (coursesLoading) return <p>Loading...</p>;
   if (coursesError) return <p>Error: {coursesError.message}</p>;
-  if (providersLoading) return <p>Loading...</p>;
   if (providersError) return <p>Error: {providersError.message}</p>;
-  // Handle moving to the next step in the form
+
   const providers = providersData?.getProviders || [];
+
   const handleNext = async () => {
     if (step === 1 && bootcampProviderId === 'other' && !providerCreated) {
       return; // Prevent moving to the next step if provider has not been created
     }
 
     if (step === 1 && bootcampProviderId && bootcampProviderId !== 'other') {
-      
       setFetchCourses(true);
     }
     if (step === 8 && !courseCreated) {
       return; // Prevent moving to the next step if course has not been created
     }
     setStep((prevStep) => prevStep + 1);
+  console.log(step);
     setSelectedOption(null);
   };
 
-  // Handle moving to the previous step in the form
   const handlePrevious = () => {
     setStep((prevStep) => prevStep - 1);
   };
 
-  // Function to render form fields based on userStatus and step
   const renderFormFields = () => {
     switch (userData.me.userStatus) {
       case 'potential':
@@ -204,25 +225,23 @@ const GetStarted = () => {
           case 0:
             return (
               <>
-              <label htmlFor="bootcampProvider">Bootcamp Provider:</label>
-              <Select
-                id="bootcampProvider"
-                className={styles.selectReact}
-
-                value={selectedOption}
-                onChange={handleChangeSelect}
-                options={[
-                  ...providers.map(provider => ({
-                    value: provider.id,
-                    label: provider.name,
-                  })),
-                  { value: 'other', label: 'Other' } // Add 'Other' option
-                ]}
-                placeholder="Select a provider"
-                
-              />
-            </>
-          );
+                <label htmlFor="bootcampProvider">Bootcamp Provider:</label>
+                <Select
+                  id="bootcampProvider"
+                  className={styles.selectReact}
+                  value={selectedOption}
+                  onChange={handleChangeSelect}
+                  options={[
+                    ...providers.map(provider => ({
+                      value: provider.id,
+                      label: provider.name,
+                    })),
+                    { value: 'other', label: 'Other' }
+                  ]}
+                  placeholder="Select a provider"
+                />
+              </>
+            );
           case 1:
             if (bootcampProviderId === 'other') {
               return (
@@ -266,6 +285,13 @@ const GetStarted = () => {
                     }))}
                     placeholder="Select a course"
                   />
+                  <label htmlFor="graduationDate">Graduation Year:</label>
+                  <input
+                    type="text"
+                    id="graduationDate"
+                    value={graduationDate}
+                    onChange={(e) => setGraduationDate(e.target.value)}
+                  />
                 </>
               );
             } else {
@@ -280,41 +306,29 @@ const GetStarted = () => {
                   />
                   <label htmlFor="deliveryMode">Delivery Mode:</label>
                   <Select
-                  id="deliveryMode"
-                  className={styles.selectReact}
-                  value={{ value: deliveryMode, label: deliveryMode }}
-                  onChange={(option) => setDeliveryMode(option.value)}
-                  options={[
-                    { value: 'in-person', label: 'In-person' },
-                    { value: 'remote', label: 'Remote' },
-                    { value: 'hybrid', label: 'Hybrid' },
-                  ]}
-                  placeholder="Select a mode"
-                  styles={{
-                    control: (provided) => ({
-                      ...provided,
-                      width: '100%', // Set the desired width here
-                    }),
-                  }}
-                />
+                    id="deliveryMode"
+                    className={styles.selectReact}
+                    value={{ value: deliveryMode, label: deliveryMode }}
+                    onChange={(option) => setDeliveryMode(option.value)}
+                    options={[
+                      { value: 'in-person', label: 'In-person' },
+                      { value: 'remote', label: 'Remote' },
+                      { value: 'hybrid', label: 'Hybrid' },
+                    ]}
+                    placeholder="Select a mode"
+                  />
                   <label htmlFor="schedule">Schedule:</label>
                   <Select
                     id="schedule"
                     className={styles.selectReact}
                     value={{ value: schedule, label: schedule }}
-                  onChange={(option) => setSchedule(option.value)}
-                  options={[
-                    { value: 'full-time', label: 'Full-time' },
-                    { value: 'part-time', label: 'Part-time}' },
-                  ]}
-                  placeholder="Select a Schedule"
-                  styles={{
-                    control: (provided) => ({
-                      ...provided,
-                      width: '100%', // Set the desired width here
-                    }),
-                  }}
-                />
+                    onChange={(option) => setSchedule(option.value)}
+                    options={[
+                      { value: 'full-time', label: 'Full-time' },
+                      { value: 'part-time', label: 'Part-time}' },
+                    ]}
+                    placeholder="Select a Schedule"
+                  />
                   <label htmlFor="cost">Cost:</label>
                   <input
                     type="number"
@@ -326,6 +340,7 @@ const GetStarted = () => {
                 </>
               );
             }
+          
           case 2:
             return (
               <>
@@ -337,8 +352,10 @@ const GetStarted = () => {
                   value={curriculumRating}
                   onChange={(value) => setCurriculumRating(value)}
                 />
+                
               </>
             );
+
           case 3:
             return (
               <>
@@ -368,19 +385,19 @@ const GetStarted = () => {
           case 5:
             return (
               <>
-                <label htmlFor="overallReview">Overall Review:</label>
+                <label htmlFor="overallRating">Overall Rating:</label>
                 <Rating
                   count={5}
                   size={24}
                   activeColor="#ffd700"
-                  value={overallReview}
-                  onChange={(value) => setOverallReview(value)}
+                  value={overallRating}
+                  onChange={(value) => setOverallRating(value)}
                 />
-                <label htmlFor="overallFeedback">Anything you'd like to say about your experience:</label>
-                <input
-                  id="overallFeedback"
-                  value={overallFeedback}
-                  onChange={(e) => setOverallFeedback(e.target.value)}
+                <label htmlFor="feedback">Anything you'd like to say about your experience:</label>
+                <textarea
+                  id="feedback"
+                  value={feedback}
+                  onChange={(e) => setFeedback(e.target.value)}
                 />
               </>
             );
@@ -392,7 +409,6 @@ const GetStarted = () => {
     }
   };
 
-  // Render the component
   return (
     <div className={styles.getStarted}>
       <div className={styles.getStartedContent}>
@@ -408,22 +424,23 @@ const GetStarted = () => {
               Go Back
             </button>
           )}
-          {step < (userData.me.userStatus === 'potential' ? 1 : 8) && (
+          {step < (userData.me.userStatus === 'potential' ? 1 : 5) && (
             <button
               type="button"
               onClick={handleNext}
-              disabled={(step === 1 && bootcampProviderId === 'other' && !providerCreated) || (step === 8 && !courseCreated)}
+              disabled={(step === 1 && bootcampProviderId === 'other' && !providerCreated) || (step === 5 && !courseCreated)}
             >
               Next
             </button>
           )}
 
-          {step === (userData.me.userStatus === 'potential' ? 1 : 8) && (
-            <button type="submit">Submit</button>
+         
+
+          {step === 5 && (
+            <button type="button" onClick={handleSubmitReview} >Submit Review</button>
           )}
         </div>
       </form>
-
     </div>
   );
 };

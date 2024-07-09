@@ -4,7 +4,8 @@ import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import Auth from '../utils/auth'; // Adjust the path based on your project structure
-
+import Header from '../components/Header'
+ 
 const Home = () => {
   const [potentialVisible, setPotentialVisible] = useState(false);
   const [currentVisible, setCurrentVisible] = useState(false);
@@ -25,14 +26,12 @@ const Home = () => {
   }
   return (
     <>
+      <Header/>
     <div className={styles.home}>
       {Auth.loggedIn() ? (
         <>
-          <div className={styles.login}>
-            <a href="/" className={styles.navLink} onClick={logout}>
-              Logout
-            </a>
-          </div>
+
+          
           {/* Empty content when logged in */}
           <section className={styles.emptyContent}>
             <div className={styles.container}>

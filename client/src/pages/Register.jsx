@@ -42,7 +42,7 @@ const Register = () => {
       // Optionally redirect to another page after successful registration
       Auth.login(token);
 
-      navigate('/'); // Redirect to home page
+      navigate('/getting-started'); // Redirect to home page
     } catch (error) {
       console.error('Registration error:', error);
     }

@@ -39,3 +39,25 @@ export const CREATE_COURSE = gql`
     }
   }
 `;
+export const UPDATE_GRAD_INFO = gql`
+  mutation UpdateGradInfo($graduationDate: String!, $courseId: ID!) {
+    updateGradInfo(updateGradInfoInput: { graduationDate: $graduationDate, courseId: $courseId }) {
+      id
+      graduationDate
+      courseId
+    }
+  }
+`;
+export const SUBMIT_REVIEW = gql`
+  mutation SubmitReview($courseId: ID!, $curriculumRating: Int!, $instructorRating: Int!, $supportRating: Int!, $overallRating: Int!, $feedback: String!) {
+    submitReview(courseId: $courseId, curriculumRating: $curriculumRating, instructorRating: $instructorRating, supportRating: $supportRating, overallRating: $overallRating, feedback: $feedback) {
+      id
+      courseId
+      curriculumRating
+      instructorRating
+      supportRating
+      overallRating
+      feedback
+    }
+  }
+`;
