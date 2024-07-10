@@ -64,6 +64,7 @@ const authTypeDefs = gql`
   }
 
   input UpdateGradInfoInput {
+    id: ID!
     graduationDate: String!
     courseId: ID!
   }

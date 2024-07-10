@@ -7,8 +7,11 @@ import { Dropdown } from "flowbite-react";
 
 const Header = () => {
   const logout = (event) => {
-    event.preventDefault();
+    if(event) {
+       event.preventDefault();
+    }  
     Auth.logout();
+    console.log('helo')
   };
   let username = ''
   if(Auth.loggedIn() === true){
@@ -27,7 +30,7 @@ const Header = () => {
                     <Dropdown label={username}dismissOnClick={false} className={styles.dropdown}>
                       <Dropdown.Item className= {styles.dropdownItem}>Profile</Dropdown.Item>
                       <Dropdown.Item className={styles.dropdownItem}>Settings</Dropdown.Item>
-                      <Dropdown.Item className={styles.dropdownItem}> Sign out</Dropdown.Item>
+                      <Dropdown.Item className={styles.dropdownItem} onClick={logout}> Sign out</Dropdown.Item>
                     </Dropdown>                    
                   </nav>
                 </div>

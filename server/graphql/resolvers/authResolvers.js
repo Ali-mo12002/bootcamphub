@@ -117,20 +117,27 @@ const authResolvers = {
     },
     updateGradInfo: async (_, { updateGradInfoInput }, { user }) => {
       if (!user) {
-        throw new Error('Authentication required');
+        throw new AuthenticationError('Authentication required');
       }
-
+    
+      const { graduationDate = '', courseId = '' } = updateGradInfoInput;
+      console.log(user, '2s23123');
       const updatedUser = await User.findByIdAndUpdate(
-        user.id,
+        user._id,
         {
-          graduationDate: updateGradInfoInput.graduationDate,
-          courseId: updateGradInfoInput.courseId,
+          graduationDate,
+          courseId,
         },
         { new: true }
       );
-
+    
+      if (!updatedUser) {
+        throw new Error('User not found or update failed.');
+      }
+    
       return updatedUser;
     },
+    
     submitReview: async (_, { courseId, curriculumRating, instructorRating, supportRating, overallRating, feedback }, context) => {
       // Assuming you have a Review model
       const review = await Review.create({

@@ -21,16 +21,12 @@ const UserSchema = new mongoose.Schema({
   },
   graduationDate: {
     type: Date,
-    required: function() {
-      return this.userStatus === 'graduate';
-    },
+    
   },
   courseId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Course',
-    required: function() {
-      return this.userStatus === 'graduate';
-    },
+     
   },
 });
 
