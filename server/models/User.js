@@ -21,12 +21,16 @@ const UserSchema = new mongoose.Schema({
   },
   graduationDate: {
     type: Date,
-    
   },
   courseId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Course',
-     
+  },
+  city: {
+    type: String,
+  },
+  interested: {
+    type: [String], // Assuming 'interested' is an array of interests
   },
 });
 

@@ -9,6 +9,8 @@ const authTypeDefs = gql`
     graduationDate: String
     courseId: ID
     token: String
+    city: String               # Optional field
+    interested: [String!]      # Optional field
   }
 
   type Provider {
@@ -28,14 +30,14 @@ const authTypeDefs = gql`
   }
 
   type Review {
-  id: ID!
-  courseId: ID!
-  curriculumRating: Int!
-  instructorRating: Int!
-  supportRating: Int!
-  overallRating: Int!
-  feedback: String!
-}
+    id: ID!
+    courseId: ID!
+    curriculumRating: Int!
+    instructorRating: Int!
+    supportRating: Int!
+    overallRating: Int!
+    feedback: String!
+  }
 
   input ProviderInput {
     name: String!
@@ -69,6 +71,12 @@ const authTypeDefs = gql`
     courseId: ID!
   }
 
+  input OnboardingInput {    
+      id: ID!
+      city: String!
+      interested: [String!]!
+  }
+
   type Query {
     me: User
     getProviders: [Provider]!
@@ -82,7 +90,7 @@ const authTypeDefs = gql`
     login(loginInput: LoginInput): User!
     updateGradInfo(updateGradInfoInput: UpdateGradInfoInput): User!
     submitReview(courseId: ID!, curriculumRating: Int!, instructorRating: Int!, supportRating: Int!, overallRating: Int!, feedback: String!): Review
-
+    completeOnboarding(onboardingInput: OnboardingInput!): User!  # New mutation for onboarding
   }
 `;
 

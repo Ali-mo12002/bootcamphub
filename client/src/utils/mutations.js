@@ -30,7 +30,6 @@ export const CREATE_PROVIDER = gql`
 export const CREATE_COURSE = gql`
   mutation CreateCourse($providerId: ID!, $name: String!, $deliveryMode: String!, $schedule: String!, $cost: Float!) {
     createCourse(input: { providerId: $providerId, name: $name, deliveryMode: $deliveryMode, schedule: $schedule, cost: $cost }) {
-      
       providerId
       name
       deliveryMode
@@ -39,15 +38,17 @@ export const CREATE_COURSE = gql`
     }
   }
 `;
+
 export const UPDATE_GRAD_INFO = gql`
-  mutation UpdateGradInfo(    $id: ID! $graduationDate: String!, $courseId: ID!) {
-    updateGradInfo(updateGradInfoInput: {     id: $id graduationDate: $graduationDate, courseId: $courseId }) {
+  mutation UpdateGradInfo($id: ID!, $graduationDate: String!, $courseId: ID!) {
+    updateGradInfo(updateGradInfoInput: { id: $id, graduationDate: $graduationDate, courseId: $courseId }) {
       id
       graduationDate
       courseId
     }
   }
 `;
+
 export const SUBMIT_REVIEW = gql`
   mutation SubmitReview($courseId: ID!, $curriculumRating: Int, $instructorRating: Int, $supportRating: Int, $overallRating: Int, $feedback: String) {
     submitReview(courseId: $courseId, curriculumRating: $curriculumRating, instructorRating: $instructorRating, supportRating: $supportRating, overallRating: $overallRating, feedback: $feedback) {
@@ -58,6 +59,16 @@ export const SUBMIT_REVIEW = gql`
       supportRating
       overallRating
       feedback
+    }
+  }
+`;
+
+export const COMPLETE_ONBOARDING = gql`
+  mutation CompleteOnboarding($id: ID!, $city: String!, $interested: [String!]!) {
+    completeOnboarding(onboardingInput: { id: $id, city: $city, interested: $interested }) {
+      id
+      city
+      interested
     }
   }
 `;

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
 import { Navigate, useNavigate } from 'react-router-dom';
-
+import Multiselect from 'react-select';
 import { GET_USER, GET_PROVIDERS, GET_COURSES_BY_PROVIDER_ID } from '../utils/queries'; // Adjust the path based on your project structure
-import { CREATE_PROVIDER, CREATE_COURSE, UPDATE_GRAD_INFO, SUBMIT_REVIEW } from '../utils/mutations'; // Adjust the path based on your project structure
+import { CREATE_PROVIDER, CREATE_COURSE, UPDATE_GRAD_INFO, SUBMIT_REVIEW, COMPLETE_ONBOARDING } from '../utils/mutations'; // Adjust the path based on your project structure
 import Rating from 'react-rating-stars-component';
 import styles from '../styles/getStarted.module.css'; // Ensure you have corresponding CSS
 import Select from 'react-select';
@@ -15,6 +15,7 @@ const GetStarted = () => {
   const [createCourse] = useMutation(CREATE_COURSE);
   const [updateGradInfo] = useMutation(UPDATE_GRAD_INFO);
   const [submitReview] = useMutation(SUBMIT_REVIEW);
+  const [completeOnboarding] = useMutation(COMPLETE_ONBOARDING);
 
   const [step, setStep] = useState(0);
   const [city, setCity] = useState('');
@@ -39,6 +40,7 @@ const GetStarted = () => {
   const [selectedOption, setSelectedOption] = useState(null);
   const [graduationDate, setGraduationDate] = useState('');
   const [bootcampId, setBootcampId] = useState(0); // Use state for bootcampId
+  const [selectedCourses, setSelectedCourses] = useState([]); // New state for selected courses
 
   const { loading: coursesLoading, error: coursesError, data: coursesData } = useQuery(GET_COURSES_BY_PROVIDER_ID, {
     variables: { providerId: bootcampProviderId },
@@ -52,12 +54,14 @@ const GetStarted = () => {
   }, [coursesData, bootcampProviderId]);
 
   useEffect(() => {
-    if (step === 1 && bootcampProviderId === 'other') {
+    if (userData && userData.me && userData.me.userStatus !== 'potential') {
+      if (step === 1 && bootcampProviderId === 'other') {
       setFetchCourses(false);
     } else if (step === 1 && bootcampProviderId !== 'other') {
       setFetchCourses(true);
     }
-  }, [step, bootcampProviderId]);
+  }
+  }, [step, bootcampProviderId, userData]);
 
   const handleSubmitProvider = async (event) => {
     event.preventDefault();
@@ -140,7 +144,23 @@ const GetStarted = () => {
     }
   };
   const navigate = useNavigate();
+  const handleCompleteOnboarding = async () => {
+    try {
+      const result = await completeOnboarding({
+        variables: {
+          id: userData.me.id,
+          city,
+          interested: selectedCourses.map(course => course.value),
+        },
+      });
+      console.log('Onboarding completed:', result.data.completeOnboarding);
+      navigate('/');
 
+    } catch (error) {
+      console.error('Error completing onboarding:', error);
+    }
+  };
+  
   const handleSubmitReview = async (event) => {
     if (event) {
       event.preventDefault(); // Check if event is defined before using it
@@ -194,6 +214,7 @@ const GetStarted = () => {
     if (step === 8 && !courseCreated) {
       return; // Prevent moving to the next step if course has not been created
     }
+    
     setStep((prevStep) => prevStep + 1);
   console.log(step);
     setSelectedOption(null);
@@ -219,22 +240,31 @@ const GetStarted = () => {
                 />
               </>
             );
-          case 1:
-            return (
-              <>
-                <label htmlFor="bootcampType">Type of Bootcamp:</label>
-                <select
-                  id="bootcampType"
-                  value={bootcampType}
-                  onChange={(e) => setBootcampType(e.target.value)}
-                >
-                  <option value="">Select a type</option>
-                  <option value="full-time">Full-time</option>
-                  <option value="part-time">Part-time</option>
-                  <option value="online">Online</option>
-                </select>
-              </>
-            );
+            case 1:
+                return (
+                  <>
+                    <label htmlFor="courses">Courses Interested In:</label>
+                    <Multiselect
+                      id="courses"
+                      isMulti
+                      options={[
+                        { value: 'Full-Stack Web Development', label: 'Full-Stack Web Development' },
+                        { value: 'Data Science', label: 'Data Science' },
+                        { value: 'Software Engineering', label: 'Software Engineering' },
+                        { value: 'User Experience Design', label: 'User Experience Design' },
+                        { value: 'Digital Marketing', label: 'Digital Marketing' },
+                        { value: 'Coding & Web Development', label: 'Coding & Web Development' },
+                        { value: 'Cyber Security', label: 'Cyber Security' },
+                        { value: 'Digital Skills', label: 'Digital Skills' },
+                        { value: 'Data Engineering', label: 'Data Engineering' },
+                        { value: 'Data Analysis', label: 'Data Analysis' },
+                      ]}
+                      value={selectedCourses}
+                      onChange={setSelectedCourses}
+                    />
+                  </>
+                );
+
           default:
             return null;
         }
@@ -622,7 +652,7 @@ const GetStarted = () => {
         return null;
     }
   };
-  const totalSteps = userData.me.userStatus === 'potential' ? 1 : userData.me.userStatus === 'current' ? 2 : 5;
+  const totalSteps = userData.me.userStatus === 'potential' ? 2 : userData.me.userStatus === 'current' ? 2 : 5;
 
   return (
     <div className={styles.getStarted}>
@@ -653,9 +683,14 @@ const GetStarted = () => {
             </button>
           )}
 
-          {step === totalSteps - 1 && (
+          {step === totalSteps - 1  && userData.me.userStatus !== "potential" && (
             <button type="button" onClick={handleSubmitReview}>
               Submit
+            </button>
+          )}
+           {step === totalSteps - 1 && userData.me.userStatus === "potential" &&(
+            <button type="button" onClick={handleCompleteOnboarding}>
+              Submits
             </button>
           )}
         </div>

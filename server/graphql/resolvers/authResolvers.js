@@ -137,6 +137,21 @@ const authResolvers = {
     
       return updatedUser;
     },
+    completeOnboarding: async(_, {  onboardingInput }, { user })  => {
+      const { city, interested } = onboardingInput;
+
+      const updatedUser = await User.findByIdAndUpdate(
+        user._id,
+        { city, interested },
+        { new: true }
+      );
+
+      if (!updatedUser) {
+        throw new Error('User not found');
+      }
+
+      return updatedUser;
+    },
     
     submitReview: async (_, { courseId, curriculumRating, instructorRating, supportRating, overallRating, feedback }, context) => {
       // Assuming you have a Review model
