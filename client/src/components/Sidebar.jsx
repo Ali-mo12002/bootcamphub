@@ -10,25 +10,23 @@ const Sidebars = () => {
         <Sidebar.Items className={styles.sidebaritems}>
           <Sidebar.ItemGroup className={styles.sidebaritemgroup}>
             <Sidebar.Item href="#" icon={HiChartPie} className={styles.sidebaritem}>
-              Dashboard
+              Home
             </Sidebar.Item>
             <Sidebar.Item href="#" icon={HiViewBoards} className={styles.sidebaritem}>
-              Kanban
+              Network
             </Sidebar.Item>
             <Sidebar.Item href="#" icon={HiInbox} className={styles.sidebaritem}>
-              Inbox
+              Job Postings
             </Sidebar.Item>
             <Sidebar.Item href="#" icon={HiUser} className={styles.sidebaritem}>
-              Users
+              Bootcamps
             </Sidebar.Item>
             <Sidebar.Item href="#" icon={HiShoppingBag} className={styles.sidebaritem}>
-              Products
+              Profile
             </Sidebar.Item>
-            <Sidebar.Item href="#" icon={HiArrowSmRight} className={styles.sidebaritem}>
-              Sign In
-            </Sidebar.Item>
+           
             <Sidebar.Item href="#" icon={HiTable} className={styles.sidebaritem}>
-              Sign Up
+              Sign Out
             </Sidebar.Item>
           </Sidebar.ItemGroup>
         </Sidebar.Items>

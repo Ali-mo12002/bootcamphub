@@ -3,6 +3,8 @@ const { signToken } = require('../../utils/auth');
 const User = require('../../models/User');
 const Provider = require('../../models/Provider');
 const Course = require('../../models/Course');
+const Post = require('../../models/Post');
+const Comment = require('../../models/Comments');
 const Review = require('../../models/Review');
 const dotenv = require('dotenv');
 const jwt = require('jsonwebtoken');
@@ -42,6 +44,16 @@ const authResolvers = {
         throw new Error(`Failed to fetch courses: ${error.message}`);
       }
     },
+    posts: async () => await Post.find().populate({
+      path: 'comments',
+      populate: { path: 'replies' }
+    }),
+    post: async (_, { id }) => await Post.findById(id).populate({
+      path: 'comments',
+      populate: { path: 'replies' }
+    }),
+    comments: async (_, { postId }) => await Comment.find({ post: postId }).populate('replies')
+  
   },
   Mutation: {
     register: async (_, { registerInput: { username, email, password, userStatus } }) => {
@@ -166,7 +178,50 @@ const authResolvers = {
 
       return review;
     },
-  },
+
+    createPost: async (_, { creatorName, content }) => {
+      const newPost = new Post({ creatorName, content });
+      return await newPost.save();
+    },
+    likePost: async (_, { postId, userId }) => {
+      const post = await Post.findById(postId);
+      const userIndex = post.likes.indexOf(userId);
+      if (userIndex > -1) {
+        // If user already liked the post, remove the like
+        post.likes.splice(userIndex, 1);
+      } else {
+        // Otherwise, add the user's like
+        post.likes.push(userId);
+      }
+      return await post.save();
+    },
+    createComment: async (_, { postId, creatorName, content, parentCommentId }) => {
+      const newComment = new Comment({ post: postId, creatorName, content, parentComment: parentCommentId });
+      if (parentCommentId) {
+        const parentComment = await Comment.findById(parentCommentId);
+        parentComment.replies.push(newComment._id);
+        await parentComment.save();
+      } else {
+        const post = await Post.findById(postId);
+        post.comments.push(newComment._id);
+        await post.save();
+      }
+      return await newComment.save();
+    },
+    likeComment: async (_, { commentId, userId }) => {
+      const comment = await Comment.findById(commentId);
+      const userIndex = comment.likes.indexOf(userId);
+      if (userIndex > -1) {
+        // If user already liked the comment, remove the like
+        comment.likes.splice(userIndex, 1);
+      } else {
+        // Otherwise, add the user's like
+        comment.likes.push(userId);
+      }
+      return await comment.save();
+    }
+  }
 };
+
 
 module.exports = authResolvers;

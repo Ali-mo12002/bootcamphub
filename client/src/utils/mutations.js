@@ -72,3 +72,71 @@ export const COMPLETE_ONBOARDING = gql`
     }
   }
 `;
+
+export const CREATE_POST = gql`
+  mutation CreatePost($creatorName: String!, $content: String!) {
+    createPost(creatorName: $creatorName, content: $content) {
+      id
+      creatorName
+      content
+      createdAt
+      likes 
+      comments {
+        id
+        content
+        creatorName
+        createdAt
+      }
+    }
+  }
+`;
+
+export const LIKE_POST = gql`
+  mutation LikePost($postId: ID!, $userId: ID!) {
+    likePost(postId: $postId, userId: $userId) {
+      id
+      likes {
+        id
+        username
+      }
+    }
+  }
+`;
+
+export const CREATE_COMMENT = gql`
+  mutation CreateComment($postId: ID!, $creatorName: String!, $content: String!, $parentCommentId: ID) {
+    createComment(postId: $postId, creatorName: $creatorName, content: $content, parentCommentId: $parentCommentId) {
+      id
+      content
+      creatorName
+      createdAt
+      post {
+        id
+      }
+      parentComment {
+        id
+      }
+      replies {
+        id
+        content
+      }
+      likes {
+        id
+        username
+      }
+    }
+  }
+`;
+
+export const LIKE_COMMENT = gql`
+  mutation LikeComment($commentId: ID!, $userId: ID!) {
+    likeComment(commentId: $commentId, userId: $userId) {
+      id
+      likes {
+        id
+        username
+      }
+    }
+  }
+`;
+

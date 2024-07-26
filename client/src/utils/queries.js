@@ -28,3 +28,30 @@ export const GET_COURSES_BY_PROVIDER_ID = gql`
     }
   }
 `;
+
+export const GET_POSTS = gql`
+  query GetPosts {
+    posts {
+        comments {
+          content
+          createdAt
+          creatorName
+          id
+          postId
+          replies {
+            content
+            createdAt
+            creatorName
+            id
+            postId
+          }
+        }
+        content
+        createdAt
+        creatorName
+        id
+        likes
+      
+    }
+  }
+`;
