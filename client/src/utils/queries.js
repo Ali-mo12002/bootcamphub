@@ -37,7 +37,7 @@ export const GET_POSTS = gql`
           createdAt
           creatorName
           id
-          postId
+          
           replies {
             content
             createdAt
@@ -52,6 +52,30 @@ export const GET_POSTS = gql`
         id
         likes
       
+    }
+  }
+`;
+
+export const GET_POST = gql`
+  query GetPost($id: ID!) {
+    post(id: $id) {
+      id
+      creatorName
+      createdAt
+      content
+      likes 
+      comments {
+        id
+        creatorName
+        createdAt
+        content
+        likes
+        replies {
+          id
+          creatorName
+          content
+        }
+      }
     }
   }
 `;

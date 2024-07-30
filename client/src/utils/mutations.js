@@ -92,38 +92,28 @@ export const CREATE_POST = gql`
 `;
 
 export const LIKE_POST = gql`
-  mutation LikePost($postId: ID!, $userId: ID!) {
-    likePost(postId: $postId, userId: $userId) {
+  mutation LikePost($postId: ID!) {
+    likePost(postId: $postId) {
       id
-      likes {
-        id
-        username
-      }
+      likes 
     }
   }
 `;
 
 export const CREATE_COMMENT = gql`
-  mutation CreateComment($postId: ID!, $creatorName: String!, $content: String!, $parentCommentId: ID) {
-    createComment(postId: $postId, creatorName: $creatorName, content: $content, parentCommentId: $parentCommentId) {
+  mutation CreateComment($postId: ID!, $creatorName: String!, $content: String!) {
+    createComment(postId: $postId, creatorName: $creatorName, content: $content) {
       id
       content
       creatorName
       createdAt
-      post {
-        id
-      }
-      parentComment {
-        id
-      }
+      postId 
+      
       replies {
         id
         content
       }
-      likes {
-        id
-        username
-      }
+      likes 
     }
   }
 `;

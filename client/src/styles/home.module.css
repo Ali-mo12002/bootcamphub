@@ -203,6 +203,51 @@ color: rgba(255, 255, 255, 0.634);
   padding: 5px 20px;
   margin: 10px 0 ;
 }
-.like{
-  width: 10%;
+.like {
+  width: 3%;
+  height: 30px;
+  padding: 0;
+  margin: 0;
+  background-color: #2b2a2a;
+  font-size: 20px;
+  border: none; /* Ensure there's no border */
 }
+
+.like:hover {
+  background-color: #2b2a2a;
+}
+
+.like:focus {
+  outline: none; /* Remove the outline when focused */
+  box-shadow: none; /* Remove any potential box-shadow */
+}
+
+.metadata{
+  display: flex;
+  justify-content: end;
+  margin: 0;
+  padding: 0;
+}
+.date{
+  margin: 0;
+  font-size: 20px;
+}
+.comment{
+  font-size: 20px;
+
+  padding: 5px 0 0 0;
+  margin: 0 6px;
+}
+.commentLength{
+  font-size: 20px;
+  margin: 0 10px 0 0;
+  
+}
+
+.likeCount{
+  font-size: 20px;
+  margin: 0 10px 0 0;
+  
+}
+
+

@@ -183,7 +183,12 @@ const authResolvers = {
       const newPost = new Post({ creatorName, content });
       return await newPost.save();
     },
-    likePost: async (_, { postId, userId }) => {
+    likePost: async (_, { postId }, { user }) => {
+      if (!user) {
+        throw new AuthenticationError('Authentication required');
+      }
+    
+      const userId = user._id; // Get the user ID from context
       const post = await Post.findById(postId);
       const userIndex = post.likes.indexOf(userId);
       if (userIndex > -1) {
@@ -195,19 +200,25 @@ const authResolvers = {
       }
       return await post.save();
     },
-    createComment: async (_, { postId, creatorName, content, parentCommentId }) => {
-      const newComment = new Comment({ post: postId, creatorName, content, parentComment: parentCommentId });
-      if (parentCommentId) {
-        const parentComment = await Comment.findById(parentCommentId);
-        parentComment.replies.push(newComment._id);
-        await parentComment.save();
-      } else {
-        const post = await Post.findById(postId);
-        post.comments.push(newComment._id);
-        await post.save();
+     createComment: async (_, { postId, creatorName, content }) => {
+    
+      const newComment = new Comment({
+        postId,
+        creatorName,
+        content
+      });
+    
+      const post = await Post.findById(postId);
+      if (!post) {
+        throw new Error('Post not found');
       }
+    
+      post.comments.push(newComment._id);
+      await post.save();
+    
       return await newComment.save();
     },
+    
     likeComment: async (_, { commentId, userId }) => {
       const comment = await Comment.findById(commentId);
       const userIndex = comment.likes.indexOf(userId);

@@ -1,6 +1,5 @@
 // src/index.jsx
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App.jsx';
@@ -10,6 +9,7 @@ import Bootcamps from './pages/Bootcamps';
 import Login from './pages/Login'; 
 import Register from './pages/Register'; 
 import GettingStarted from './pages/GettingStarted';
+import PostDetail from './pages/Post'; // Import PostDetail component
 
 const router = createBrowserRouter([
   {
@@ -20,22 +20,30 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <Home />
-      }, {
+      },
+      {
         path: '/bootcamps',
         element: <Bootcamps />
-      }, {
+      },
+      {
         path: '/login',
         element: <Login />
-      }, {
+      },
+      {
         path: '/register',
         element: <Register />
-      }, {
+      },
+      {
         path: '/getting-started',
         element: <GettingStarted />
+      },
+      {
+        path: '/post/:postId', // Route for specific post
+        element: <PostDetail />
       }
     ]
   }
-])
+]);
 
 // Render your app using ReactDOM.createRoot
 ReactDOM.createRoot(document.getElementById('root')).render(

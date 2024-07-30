@@ -14,7 +14,7 @@ const commentSchema = new Schema({
     type: Date,
     default: Date.now
   },
-  post: {
+  postId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Post',
     required: true

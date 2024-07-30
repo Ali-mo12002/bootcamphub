@@ -87,14 +87,14 @@ const authTypeDefs = gql`
   }
 
   type Comment {
-    id: ID!
-    creatorName: String!
-    createdAt: String!
-    content: String!
-    postId: ID!
-    replies: [Comment!]!
-    likes: [ID!]!
-  }
+  id: ID!
+  creatorName: String!
+  createdAt: String!
+  content: String!
+  postId: ID!          # Ensure this is non-nullable
+  replies: [Comment!]!
+  likes: [ID!]!
+}
 
   type Query {
     me: User

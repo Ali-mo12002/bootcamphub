@@ -4,10 +4,12 @@ import styles from '../styles/home.module.css'; // CSS Modules
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
+import { FaRegCommentAlt } from "react-icons/fa";
+import { AiFillLike } from "react-icons/ai";
 import Auth from '../utils/auth'; // Adjust the path based on your project structure
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
-import { CREATE_POST } from '../utils/mutations'; // Import GraphQL operations
+import { CREATE_POST, LIKE_POST } from '../utils/mutations'; // Import GraphQL operations
 import { GET_POSTS } from '../utils/queries'; // Import GraphQL operations
 import { formatDistanceToNow } from 'date-fns';
 
@@ -17,23 +19,40 @@ const formatDate = (timestamp) => {
   return date.toLocaleString(); // You can format the date string as needed
 };
 const Post = ({ post }) => {
-  return (
+  const userId = Auth.loggedIn() ? Auth.getProfile().data._id : null;
+  const [likePost] = useMutation(LIKE_POST, {
+    refetchQueries: ['GetPosts'],
+  });
 
+  const handleLike = async () => {
+    if (!userId) {
+      console.error('User must be logged in to like a post');
+      return;
+    }
+    try {
+      await likePost({ variables: { postId: post.id, userId } });
+    } catch (error) {
+      console.error('Error liking post:', error);
+    }
+  };
+
+  return (
     <div className={styles.post}>
-      <h3>{post.creatorName}</h3>
+      <h3>        
+        <Link to={`/post/${post.id}`}>{post.creatorName}</Link> {/* Link to post detail */}
+      </h3>
       <p>{post.content}</p>
-      <p>{formatDistanceToNow(new Date(parseInt(post.createdAt)))} ago</p>
-      <div>
-        <button className={styles.like}>Like ({post.likes.length})</button>
-        {/* You can add functionality for liking and commenting here */}
+      <div className={styles.metadata}>
+        <button className={styles.like} onClick={handleLike}>
+          <AiFillLike />
+        </button>
+        <p className={styles.likeCount}>{post.likes.length}</p>
+
+        <FaRegCommentAlt className={styles.comment} />
+        <p className={styles.commentLength}>{post.comments.length}</p>
+        <p className={styles.date}>{formatDistanceToNow(new Date(parseInt(post.createdAt)))} ago</p>
       </div>
-      <div>
-        {post.comments.map(comment => (
-          <div key={comment.id}>
-            <p>{comment.creatorName}: {comment.content}</p>
-          </div>
-        ))}
-      </div>
+      
     </div>
   );
 };

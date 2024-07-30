@@ -8,6 +8,7 @@ import Login from './pages/Login'; // Placeholder for Login page
 import Register from './pages/Register'; // Placeholder for Register page
 import Footer from './components/Footer'; // Optional: Create Footer component
 import GettingStarted from './pages/GettingStarted';
+import PostDetail from './pages/Post'
 import { setContext } from "@apollo/client/link/context";
 const httpLink = createHttpLink({
   uri: "/graphql",
@@ -39,6 +40,7 @@ const App = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/getting-started" element={<GettingStarted />} />
+          <Route path="/post/:postId" element={<PostDetail />} /> 
         </Routes>
         <Footer /> {/* Optional: Include Footer component */}
       </div>
