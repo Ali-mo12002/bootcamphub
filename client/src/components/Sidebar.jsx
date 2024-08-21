@@ -9,10 +9,10 @@ const Sidebars = () => {
       <Sidebar aria-label="Sidebar with logo branding example">
         <Sidebar.Items className={styles.sidebaritems}>
           <Sidebar.ItemGroup className={styles.sidebaritemgroup}>
-            <Sidebar.Item href="#" icon={HiChartPie} className={styles.sidebaritem}>
+            <Sidebar.Item href="/" icon={HiChartPie} className={styles.sidebaritem}>
               Home
             </Sidebar.Item>
-            <Sidebar.Item href="#" icon={HiViewBoards} className={styles.sidebaritem}>
+            <Sidebar.Item href="/network" icon={HiViewBoards} className={styles.sidebaritem}>
               Network
             </Sidebar.Item>
             <Sidebar.Item href="#" icon={HiInbox} className={styles.sidebaritem}>

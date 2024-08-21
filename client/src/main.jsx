@@ -10,7 +10,7 @@ import Login from './pages/Login';
 import Register from './pages/Register'; 
 import GettingStarted from './pages/GettingStarted';
 import PostDetail from './pages/Post'; // Import PostDetail component
-
+import Network from './pages/Network.jsx'
 const router = createBrowserRouter([
   {
     path: '/',
@@ -36,6 +36,10 @@ const router = createBrowserRouter([
       {
         path: '/getting-started',
         element: <GettingStarted />
+      },
+      {
+        path: '/network',
+        element: <Network />
       },
       {
         path: '/post/:postId', // Route for specific post

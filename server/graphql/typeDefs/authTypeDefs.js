@@ -35,7 +35,7 @@ const authTypeDefs = gql`
     curriculumRating: Int!
     instructorRating: Int!
     supportRating: Int!
-    overallRating: Int!
+    overallRating: Int
     feedback: String!
   }
 
@@ -92,6 +92,7 @@ const authTypeDefs = gql`
   createdAt: String!
   content: String!
   postId: ID!          # Ensure this is non-nullable
+  parentCommentId: ID
   replies: [Comment!]!
   likes: [ID!]!
 }
@@ -100,23 +101,26 @@ const authTypeDefs = gql`
     me: User
     getProviders: [Provider]!
     getCoursesByProvider(providerId: ID!): [Course]!
-    comments: [Comment!]!
     posts: [Post!]!
     post(id: ID!): Post
+      getCommentReplies(commentId: ID!): Comment
+  getRecommendedPeople(userId: ID!): [User]
+
   }
 
   type Mutation {
     createPost(creatorName: String!, content: String!): Post!
-    createComment(creatorName: String!, content: String!, postId: ID!): Comment!
+    createComment(creatorName: String!, content: String!, postId: ID!, parentCommentId: ID): Comment!
     likePost(postId: ID!): Post!
     replyComment(creatorName: String!, content: String!, commentId: ID!): Comment!
-    likeComment(commentId: ID!): Comment!
+    likeComment(commentId: ID!, userId: ID!): Comment!
+      likeReply(commentId: ID!, userId: ID!): Comment!
     register(registerInput: RegisterInput): User!
     createProvider(input: ProviderInput!): Provider!
     createCourse(input: CourseInput!): Course!
     login(loginInput: LoginInput): User!
     updateGradInfo(updateGradInfoInput: UpdateGradInfoInput): User!
-    submitReview(courseId: ID!, curriculumRating: Int!, instructorRating: Int!, supportRating: Int!, overallRating: Int!, feedback: String!): Review
+    submitReview(courseId: ID!, curriculumRating: Int!, instructorRating: Int!, supportRating: Int!, overallRating: Int, feedback: String!): Review
     completeOnboarding(onboardingInput: OnboardingInput!): User!
   }
 `;

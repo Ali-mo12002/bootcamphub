@@ -55,7 +55,6 @@ export const GET_POSTS = gql`
     }
   }
 `;
-
 export const GET_POST = gql`
   query GetPost($id: ID!) {
     post(id: $id) {
@@ -63,7 +62,7 @@ export const GET_POST = gql`
       creatorName
       createdAt
       content
-      likes 
+      likes
       comments {
         id
         creatorName
@@ -74,8 +73,40 @@ export const GET_POST = gql`
           id
           creatorName
           content
+          likes
+          
         }
       }
+    }
+  }
+`;
+
+export const GET_COMMENT_REPLIES = gql`
+query GetCommentReplies($commentId: ID!) {
+  getCommentReplies(commentId: $commentId) {
+    id
+    creatorName
+    content
+    createdAt
+    likes
+    replies {
+      id
+      creatorName
+      content
+      createdAt
+      likes
+    }
+  }
+}
+`;
+
+export const GET_RECOMMENDED_PEOPLE = gql`
+  query GetRecommendedPeople($userId: ID!) {
+    getRecommendedPeople(userId: $userId) {
+      id
+      username
+      graduationDate
+      city
     }
   }
 `;

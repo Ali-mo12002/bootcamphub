@@ -1,0 +1,17 @@
+.layout{
+    display: flex;
+    
+}
+.networkFeed{
+    width: 55%;
+    text-align: center;
+}
+.recommendedPeople{
+    background-color: #2a2a2a;
+    width: 25%;
+    padding: 10px;
+
+    border-left: 2px solid #1c1c1c; /* Light border color */
+    border-top: 2px solid #1c1c1c; /* Light border color */
+    
+}

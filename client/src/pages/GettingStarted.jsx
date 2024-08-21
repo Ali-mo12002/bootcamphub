@@ -12,7 +12,18 @@ const GetStarted = () => {
   const { loading: userLoading, error: userError, data: userData } = useQuery(GET_USER);
   const { loading: providersLoading, error: providersError, data: providersData } = useQuery(GET_PROVIDERS);
   const [createProvider] = useMutation(CREATE_PROVIDER);
-  const [createCourse] = useMutation(CREATE_COURSE);
+  const [bootcampId, setBootcampId] = useState(0); // Use state for bootcampId
+
+  const [createCourse] = useMutation(CREATE_COURSE, {
+    onCompleted: (data) => {
+      console.log(data);
+      // Update bootcampId with the new bootcamp's ID
+      setBootcampId(data.createCourse.id);
+    },
+    onError: (error) => {
+      console.error('Error creating bootcamp:', error);
+    },
+  });
   const [updateGradInfo] = useMutation(UPDATE_GRAD_INFO);
   const [submitReview] = useMutation(SUBMIT_REVIEW);
   const [completeOnboarding] = useMutation(COMPLETE_ONBOARDING);
@@ -39,7 +50,6 @@ const GetStarted = () => {
   const [courses, setCourses] = useState([]);
   const [selectedOption, setSelectedOption] = useState(null);
   const [graduationDate, setGraduationDate] = useState('');
-  const [bootcampId, setBootcampId] = useState(0); // Use state for bootcampId
   const [selectedCourses, setSelectedCourses] = useState([]); // New state for selected courses
 
   const { loading: coursesLoading, error: coursesError, data: coursesData } = useQuery(GET_COURSES_BY_PROVIDER_ID, {
@@ -127,12 +137,13 @@ const GetStarted = () => {
     }
     console.log(graduationDate);
     console.log(userData.me);
+    console.log(bootcampId);
     try {
       const result = await updateGradInfo({
         variables: {
           id: userData.me.id,
           graduationDate: graduationDate,
-          courseId: selectedOption.value,
+          courseId: bootcampId,
         },
       });
 
@@ -183,7 +194,8 @@ const GetStarted = () => {
         });
   
         console.log('Submitted review:', result.data.submitReview);
-        
+        handleSubmit();
+
         // Navigate after successful review submission
         navigate('/');
       } catch (error) {
@@ -192,6 +204,7 @@ const GetStarted = () => {
     } else {
       // If not a graduate, handle regular form submission
       handleSubmit();
+      console.log('hello');
       navigate('/');
     }
   };
@@ -652,7 +665,7 @@ const GetStarted = () => {
         return null;
     }
   };
-  const totalSteps = userData.me.userStatus === 'potential' ? 2 : userData.me.userStatus === 'current' ? 2 : 5;
+  const totalSteps = userData.me.userStatus === 'potential' ? 2 : userData.me.userStatus === 'current' ? 2 : 6;
 
   return (
     <div className={styles.getStarted}>

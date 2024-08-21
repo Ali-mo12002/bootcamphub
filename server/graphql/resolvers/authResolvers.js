@@ -4,7 +4,7 @@ const User = require('../../models/User');
 const Provider = require('../../models/Provider');
 const Course = require('../../models/Course');
 const Post = require('../../models/Post');
-const Comment = require('../../models/Comments');
+const Comment = require('../../models/Comments'); // Ensure the model name is correct
 const Review = require('../../models/Review');
 const dotenv = require('dotenv');
 const jwt = require('jsonwebtoken');
@@ -15,7 +15,7 @@ const authResolvers = {
   Query: {
     me: async (_, __, context) => {
       if (!context.user) {
-        throw new Error('you need to be logged in');
+        throw new Error('You need to be logged in');
       }
 
       try {
@@ -52,7 +52,62 @@ const authResolvers = {
       path: 'comments',
       populate: { path: 'replies' }
     }),
-    comments: async (_, { postId }) => await Comment.find({ post: postId }).populate('replies')
+    getCommentReplies: async (_, { commentId }) => {
+      try {
+        const comment = await Comment.findById(commentId).populate('replies');
+        if (!comment) {
+          throw new Error('Comment not found');
+        }
+        return comment;
+      } catch (error) {
+        throw new Error(`Failed to fetch comment replies: ${error.message}`);
+      }
+    },
+    getRecommendedPeople: async (_, { userId }) => {
+      try {
+        // Fetch the current user's details
+        const currentUser = await User.findById(userId);
+        if (!currentUser) {
+          throw new Error('User not found');
+        }
+
+        // Search for users who did the same course and graduated the same year
+        let recommendedPeople = await User.find({
+          _id: { $ne: userId }, // Exclude the current user
+          courseId: currentUser.courseId,
+          graduationYear: currentUser.graduationYear,
+        });
+
+        // If no users found, search for users who did the same course (regardless of year)
+        if (recommendedPeople.length === 0) {
+          recommendedPeople = await User.find({
+            _id: { $ne: userId },
+            courseId: currentUser.courseId,
+          });
+        }
+
+        // If no users found, search for users who graduated the same year (regardless of course)
+        if (recommendedPeople.length === 0) {
+          recommendedPeople = await User.find({
+            _id: { $ne: userId },
+            graduationYear: currentUser.graduationYear,
+          });
+        }
+
+        // If still no users found, get random users (up to 10)
+        if (recommendedPeople.length === 0) {
+          recommendedPeople = await User.aggregate([
+            { $match: { _id: { $ne: userId } } },
+            { $sample: { size: 10 } },
+          ]);
+        }
+
+        return recommendedPeople;
+      } catch (error) {
+        console.error('Error fetching recommended people:', error);
+        throw new Error('Failed to fetch recommended people');
+      }
+    },
   
   },
   Mutation: {
@@ -63,10 +118,11 @@ const authResolvers = {
           throw new Error('User already exists');
         }
 
+        const hashedPassword = await bcrypt.hash(password, 12); // Hash the password before saving
         const user = await User.create({
           username,
           email,
-          password,
+          password: hashedPassword,
           userStatus,
         });
 
@@ -104,10 +160,7 @@ const authResolvers = {
         }
 
         provider = await Provider.create({ name, location, website });
-        console.log(provider);
-        const savedProvider = await provider.save();
-        console.log(savedProvider);
-        return savedProvider;
+        return provider;
       } catch (error) {
         throw new Error(`Failed to create provider: ${error.message}`);
       }
@@ -121,8 +174,7 @@ const authResolvers = {
           schedule,
           cost,
         });
-        const savedCourse = await course.save();
-        return savedCourse;
+        return course;
       } catch (error) {
         throw new Error(`Failed to create course: ${error.message}`);
       }
@@ -133,7 +185,6 @@ const authResolvers = {
       }
     
       const { graduationDate = '', courseId = '' } = updateGradInfoInput;
-      console.log(user, '2s23123');
       const updatedUser = await User.findByIdAndUpdate(
         user._id,
         {
@@ -149,9 +200,12 @@ const authResolvers = {
     
       return updatedUser;
     },
-    completeOnboarding: async(_, {  onboardingInput }, { user })  => {
-      const { city, interested } = onboardingInput;
+    completeOnboarding: async(_, { onboardingInput }, { user }) => {
+      if (!user) {
+        throw new AuthenticationError('Authentication required');
+      }
 
+      const { city, interested } = onboardingInput;
       const updatedUser = await User.findByIdAndUpdate(
         user._id,
         { city, interested },
@@ -164,9 +218,7 @@ const authResolvers = {
 
       return updatedUser;
     },
-    
     submitReview: async (_, { courseId, curriculumRating, instructorRating, supportRating, overallRating, feedback }, context) => {
-      // Assuming you have a Review model
       const review = await Review.create({
         courseId,
         curriculumRating,
@@ -178,7 +230,6 @@ const authResolvers = {
 
       return review;
     },
-
     createPost: async (_, { creatorName, content }) => {
       const newPost = new Post({ creatorName, content });
       return await newPost.save();
@@ -200,27 +251,40 @@ const authResolvers = {
       }
       return await post.save();
     },
-     createComment: async (_, { postId, creatorName, content }) => {
-    
+    createComment: async (_, { postId, creatorName, content, parentCommentId }) => {
       const newComment = new Comment({
         postId,
         creatorName,
-        content
+        content,
+        parentComment: parentCommentId || null, // Include parentCommentId if provided
       });
-    
-      const post = await Post.findById(postId);
-      if (!post) {
-        throw new Error('Post not found');
+
+      // If it's a reply to another comment
+      if (parentCommentId) {
+        const parentComment = await Comment.findById(parentCommentId);
+        if (!parentComment) {
+          throw new Error('Parent comment not found');
+        }
+        parentComment.replies.push(newComment._id);
+        await parentComment.save();
+      } else {
+        // If it's a direct comment on the post
+        const post = await Post.findById(postId);
+        if (!post) {
+          throw new Error('Post not found');
+        }
+        post.comments.push(newComment._id);
+        await post.save();
       }
-    
-      post.comments.push(newComment._id);
-      await post.save();
     
       return await newComment.save();
     },
-    
     likeComment: async (_, { commentId, userId }) => {
       const comment = await Comment.findById(commentId);
+      if (!comment) {
+        throw new Error('Comment not found');
+      }
+      console.log(userId)
       const userIndex = comment.likes.indexOf(userId);
       if (userIndex > -1) {
         // If user already liked the comment, remove the like
@@ -230,9 +294,26 @@ const authResolvers = {
         comment.likes.push(userId);
       }
       return await comment.save();
-    }
+    },
+    likeReply: async (_, { commentId, userId }) => {
+      const reply = await Comment.findById(commentId);
+      if (!reply) {
+        throw new Error('Reply not found');
+      }
+
+      const userIndex = reply.likes.indexOf(userId);
+      if (userIndex > -1) {
+        // If user already liked the comment, remove the like
+        reply.likes.splice(userIndex, 1);
+      } else {
+        // Otherwise, add the user's like
+        reply.likes.push(userId);
+      }
+      
+      await reply.save();
+      return reply;
+    },
   }
 };
-
 
 module.exports = authResolvers;

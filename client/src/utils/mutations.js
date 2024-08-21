@@ -30,6 +30,7 @@ export const CREATE_PROVIDER = gql`
 export const CREATE_COURSE = gql`
   mutation CreateCourse($providerId: ID!, $name: String!, $deliveryMode: String!, $schedule: String!, $cost: Float!) {
     createCourse(input: { providerId: $providerId, name: $name, deliveryMode: $deliveryMode, schedule: $schedule, cost: $cost }) {
+    id
       providerId
       name
       deliveryMode
@@ -45,12 +46,13 @@ export const UPDATE_GRAD_INFO = gql`
       id
       graduationDate
       courseId
+      
     }
   }
 `;
 
 export const SUBMIT_REVIEW = gql`
-  mutation SubmitReview($courseId: ID!, $curriculumRating: Int, $instructorRating: Int, $supportRating: Int, $overallRating: Int, $feedback: String) {
+  mutation SubmitReview($courseId: ID!, $curriculumRating: Int!, $instructorRating: Int!, $supportRating: Int!, $overallRating: Int, $feedback: String!) {
     submitReview(courseId: $courseId, curriculumRating: $curriculumRating, instructorRating: $instructorRating, supportRating: $supportRating, overallRating: $overallRating, feedback: $feedback) {
       id
       courseId
@@ -101,32 +103,40 @@ export const LIKE_POST = gql`
 `;
 
 export const CREATE_COMMENT = gql`
-  mutation CreateComment($postId: ID!, $creatorName: String!, $content: String!) {
-    createComment(postId: $postId, creatorName: $creatorName, content: $content) {
+  mutation CreateComment($postId: ID!, $creatorName: String!, $content: String!, $parentCommentId: ID) {
+    createComment(postId: $postId, creatorName: $creatorName, content: $content, parentCommentId: $parentCommentId) {
       id
       content
       creatorName
       createdAt
-      postId 
-      
+      postId
+      parentCommentId
       replies {
         id
         content
+        creatorName
+        createdAt
       }
       likes 
     }
   }
 `;
 
+
 export const LIKE_COMMENT = gql`
   mutation LikeComment($commentId: ID!, $userId: ID!) {
     likeComment(commentId: $commentId, userId: $userId) {
       id
-      likes {
-        id
-        username
-      }
+      likes
     }
   }
 `;
 
+export const LIKE_REPLY = gql`
+  mutation LikeReply($commentId: ID!, $userId: ID!) {
+    likeReply(commentId: $commentId, userId: $userId) {
+      id
+      likes 
+    }
+  }
+`;

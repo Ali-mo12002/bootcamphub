@@ -59,20 +59,44 @@ align-items: center;
     justify-content: end;
 }
 .replybtn{
-    width: 30px;
+    width: 100px;
     padding: 5px;
+    background: none;
+    border: none;
+}
+.replybtn:hover{
+    color: #007bff;
+    background: none;
+}
+.likebtn{
+    width: 50px;
+    padding: 0;
+    margin: 0;
+    background: none;
+    border: none;
+}
+.likebtn:hover{
+    color: #007bff;
     background: none;
 }
 .commentLength{
     font-size: 20px;
-    margin: 0 10px 0 0;
     
   }
+
   
-  .likeCount{
-    font-size: 20px;
-    margin: 0 10px 0 0;
+.showRepliesBtn{
+    font-size: 25px;
+    margin: 10px 0 0 0;
+    padding-bottom: 5px;
+    text-decoration: underline;
     
-  }
-  
-  
+}
+.showRepliesBtn:hover{
+    color: #007bff;
+    cursor: pointer;
+}
+.replybtncontainer{
+    display: flex;
+    width: 100%;
+}
