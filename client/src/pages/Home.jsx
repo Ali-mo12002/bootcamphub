@@ -21,6 +21,8 @@ const formatDate = (timestamp) => {
 
 const Post = ({ post }) => {
   const userId = Auth.loggedIn() ? Auth.getProfile().data._id : null;
+  const navigate = useNavigate(); // Initialize useNavigate
+
   const [likePost] = useMutation(LIKE_POST, {
     refetchQueries: [{ query: GET_POSTS }],
   });
@@ -36,11 +38,13 @@ const Post = ({ post }) => {
       console.error('Error liking post:', error);
     }
   };
-
+  const handlePostClick = () => {
+    navigate(`/post/${post.id}`); // Navigate to the post page
+  };
   return (
-    <div className={styles.post}>
+    <div className={styles.post} onClick={handlePostClick}> {/* Use div to handle clicks */}
       <h3>        
-        <Link to={`/post/${post.id}`}>{post.creatorName}</Link> {/* Link to post detail */}
+          { post.creatorName }    
       </h3>
       <p>{post.content}</p>
       <div className={styles.metadata}>

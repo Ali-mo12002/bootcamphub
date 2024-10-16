@@ -2,7 +2,7 @@ import React from 'react';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 import styles from '../styles/network.module.css';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaRegCommentAlt } from "react-icons/fa";
 import { AiFillLike } from "react-icons/ai";
 import { useQuery, useMutation } from '@apollo/client';
@@ -13,6 +13,8 @@ import { formatDistanceToNow } from 'date-fns'; // Import formatDistanceToNow
 
 // Post Component for rendering network posts
 const Post = ({ post }) => {
+  const navigate = useNavigate(); // Initialize useNavigate
+
   const userId = Auth.getProfile()?.data?._id; // Get the current user's ID
 
   // Mutation to like a post
@@ -21,7 +23,8 @@ const Post = ({ post }) => {
     onError: (error) => console.error('Error liking post:', error),
   });
 
-  const handleLike = async () => {
+  const handleLike = async (event) => {
+    event.stopPropagation();
     if (!userId) {
       console.error('User must be logged in to like a post');
       return;
@@ -32,14 +35,18 @@ const Post = ({ post }) => {
       console.error('Error liking post:', error);
     }
   };
+  const handlePostClick = () => {
+    navigate(`/post/${post.id}`); // Navigate to the post page
+  };
 
   return (
-    <Link to={`/post/${post.id}`} className={styles.post}> {/* Make the entire post clickable */}
+    <div className={styles.post} onClick={handlePostClick}> {/* Use div to handle clicks */}
       <h3>{post.creatorName}</h3> {/* Creator's name */}
       <p>{post.content}</p>
       <div className={styles.metadata}>
         <button className={styles.like} onClick={handleLike}>
           <AiFillLike />
+          
         </button>
         <p className={styles.likeCount}>{post.likes.length}</p>
 
@@ -47,7 +54,7 @@ const Post = ({ post }) => {
         <p className={styles.commentLength}>{post.comments.length}</p>
         <p className={styles.date}>{formatDistanceToNow(new Date(parseInt(post.createdAt)))} ago</p>
       </div>
-    </Link>
+    </div>
   );
 };
 
