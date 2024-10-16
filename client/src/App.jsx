@@ -11,6 +11,7 @@ import GettingStarted from './pages/GettingStarted';
 import PostDetail from './pages/Post'
 import { setContext } from "@apollo/client/link/context";
 import Network from './pages/Network'
+
 const httpLink = createHttpLink({
   uri: "/graphql",
 });
@@ -29,7 +30,6 @@ const client = new ApolloClient({
 });
 
 const App = () => {
-
   return (
     <ApolloProvider client={client}>
         <>
@@ -42,7 +42,7 @@ const App = () => {
           <Route path="/register" element={<Register />} />
           <Route path="/getting-started" element={<GettingStarted />} />
           <Route path="/post/:postId" element={<PostDetail />} /> 
-          <Route path="/network" element={<Network />} /> 
+          <Route path="/network" element={<Network />} />
 
         </Routes>
         <Footer /> {/* Optional: Include Footer component */}

@@ -202,6 +202,14 @@ color: rgba(255, 255, 255, 0.634);
   background-color: #2b2a2a;
   padding: 5px 20px;
   margin: 10px 0 ;
+  text-align: start;
+  cursor: pointer; /* Change the cursor to pointer */
+padding: 10px; /* Optional: add some padding for better click area */
+margin-bottom: 10px; /* Optional: space between posts */
+border-radius: 5px; /* Optional: rounded corners */
+}
+.post:hover {
+  background-color: rgba(249, 249, 249, 0.131);
 }
 .like {
   width: 3%;
@@ -215,6 +223,7 @@ color: rgba(255, 255, 255, 0.634);
 
 .like:hover {
   background-color: #2b2a2a;
+  
 }
 
 .like:focus {

@@ -3,16 +3,18 @@ import { useQuery, useMutation } from '@apollo/client';
 import { Navigate, useNavigate } from 'react-router-dom';
 import Multiselect from 'react-select';
 import { GET_USER, GET_PROVIDERS, GET_COURSES_BY_PROVIDER_ID } from '../utils/queries'; // Adjust the path based on your project structure
-import { CREATE_PROVIDER, CREATE_COURSE, UPDATE_GRAD_INFO, SUBMIT_REVIEW, COMPLETE_ONBOARDING } from '../utils/mutations'; // Adjust the path based on your project structure
+import { CREATE_PROVIDER, CREATE_COURSE, UPDATE_GRAD_INFO, SUBMIT_REVIEW, COMPLETE_ONBOARDING, UPDATE_CITY_MUTATION } from '../utils/mutations'; // Adjust the path based on your project structure
 import Rating from 'react-rating-stars-component';
 import styles from '../styles/getStarted.module.css'; // Ensure you have corresponding CSS
 import Select from 'react-select';
+
 
 const GetStarted = () => {
   const { loading: userLoading, error: userError, data: userData } = useQuery(GET_USER);
   const { loading: providersLoading, error: providersError, data: providersData } = useQuery(GET_PROVIDERS);
   const [createProvider] = useMutation(CREATE_PROVIDER);
   const [bootcampId, setBootcampId] = useState(0); // Use state for bootcampId
+  
 
   const [createCourse] = useMutation(CREATE_COURSE, {
     onCompleted: (data) => {
@@ -27,6 +29,7 @@ const GetStarted = () => {
   const [updateGradInfo] = useMutation(UPDATE_GRAD_INFO);
   const [submitReview] = useMutation(SUBMIT_REVIEW);
   const [completeOnboarding] = useMutation(COMPLETE_ONBOARDING);
+  const [updateCity] = useMutation(UPDATE_CITY_MUTATION);
 
   const [step, setStep] = useState(0);
   const [city, setCity] = useState('');
@@ -56,23 +59,26 @@ const GetStarted = () => {
     variables: { providerId: bootcampProviderId },
     skip: !fetchCourses,
   });
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     if (bootcampProviderId && bootcampProviderId !== 'other' && coursesData && coursesData.getCoursesByProvider) {
       setCourses(coursesData.getCoursesByProvider);
     }
   }, [coursesData, bootcampProviderId]);
-
+  
   useEffect(() => {
     if (userData && userData.me && userData.me.userStatus !== 'potential') {
-      if (step === 1 && bootcampProviderId === 'other') {
+      if (step === 2 && bootcampProviderId === 'other') {
       setFetchCourses(false);
-    } else if (step === 1 && bootcampProviderId !== 'other') {
+    } else if (step === 2 && bootcampProviderId !== 'other') {
       setFetchCourses(true);
     }
   }
   }, [step, bootcampProviderId, userData]);
 
+  
   const handleSubmitProvider = async (event) => {
     event.preventDefault();
 
@@ -115,7 +121,7 @@ const GetStarted = () => {
   };
   const handleChangeSelect = (selectedOption) => {
     setSelectedOption(selectedOption);
-    if (step === 1 && bootcampProviderId && bootcampProviderId !== 'other') {
+    if (step === 2 && bootcampProviderId && bootcampProviderId !== 'other') {
       if (selectedOption.value === 'other') {
         setBootcampName(''); // Reset bootcampName when "Other" is selected
       }else{
@@ -138,7 +144,17 @@ const GetStarted = () => {
     console.log(graduationDate);
     console.log(userData.me);
     console.log(bootcampId);
+    console.log(city);
     try {
+      const updatedCity = await updateCity({
+        variables: {
+          updateCityInput: { 
+          id: userData.me.id, // Assuming user ID is passed to the function
+          city,
+          }
+        },
+      });
+      console.log('updatedCity: ' , updatedCity)
       const result = await updateGradInfo({
         variables: {
           id: userData.me.id,
@@ -148,19 +164,27 @@ const GetStarted = () => {
       });
 
       console.log('Updated grad info:', result.data.updateGradInfo);
-
+      navigate('/')
       // After updating grad info, proceed to review submission
     } catch (error) {
       console.error('Error updating grad info:', error);
     }
   };
-  const navigate = useNavigate();
   const handleCompleteOnboarding = async () => {
+
     try {
+      const updatedCity = await updateCity({
+        variables: {
+          updateCityInput: { 
+          id: userData.me.id, // Assuming user ID is passed to the function
+          city,
+          },
+        },
+      });
+      console.log('updatedCity: ' , updatedCity)
       const result = await completeOnboarding({
         variables: {
           id: userData.me.id,
-          city,
           interested: selectedCourses.map(course => course.value),
         },
       });
@@ -172,6 +196,7 @@ const GetStarted = () => {
     }
   };
   
+  
   const handleSubmitReview = async (event) => {
     if (event) {
       event.preventDefault(); // Check if event is defined before using it
@@ -182,6 +207,7 @@ const GetStarted = () => {
       try {
         console.log(overallRating);
         console.log(bootcampId);
+       
         const result = await submitReview({
           variables: {
             courseId: bootcampId,
@@ -217,11 +243,11 @@ const GetStarted = () => {
   const providers = providersData?.getProviders || [];
 
   const handleNext = async () => {
-    if (step === 1 && bootcampProviderId === 'other' && !providerCreated) {
+    if (step === 2 && bootcampProviderId === 'other' && !providerCreated) {
       return; // Prevent moving to the next step if provider has not been created
     }
 
-    if (step === 1 && bootcampProviderId && bootcampProviderId !== 'other') {
+    if (step === 2 && bootcampProviderId && bootcampProviderId !== 'other') {
       setFetchCourses(true);
     }
     if (step === 8 && !courseCreated) {
@@ -236,7 +262,12 @@ const GetStarted = () => {
   const handlePrevious = () => {
     setStep((prevStep) => prevStep - 1);
   };
+  
+  console.log(userData)
 
+  if(userData.me.hasCompletedOnboarding){
+    navigate('/');
+  }
   const renderFormFields = () => {
     switch (userData.me.userStatus) {
       case 'potential':
@@ -284,6 +315,18 @@ const GetStarted = () => {
         case 'current':
           switch (step) {
             case 0:
+            return (
+              <>
+                <label htmlFor="city">City:</label>
+                <input
+                  type="text"
+                  id="city"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                />
+              </>
+            );
+            case 1:
               return (
                 <>
                   <label htmlFor="bootcampProvider">Bootcamp Provider:</label>
@@ -303,7 +346,7 @@ const GetStarted = () => {
                   />
                 </>
               );
-            case 1:
+            case 2:
               if (bootcampProviderId === 'other') {
                 return (
                   <>
@@ -473,6 +516,18 @@ const GetStarted = () => {
           case 0:
             return (
               <>
+                <label htmlFor="city">City:</label>
+                <input
+                  type="text"
+                  id="city"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                />
+              </>
+            );
+          case 1:
+            return (
+              <>
                 <label htmlFor="bootcampProvider">Bootcamp Provider:</label>
                 <Select
                   id="bootcampProvider"
@@ -491,7 +546,7 @@ const GetStarted = () => {
               </>
             );
 
-          case 1:
+          case 2:
             if (bootcampProviderId === 'other') {
               return (
                 <>
@@ -598,7 +653,7 @@ const GetStarted = () => {
               );
             }
           
-          case 2:
+          case 3:
             return (
               <>
                 <label htmlFor="curriculumRating">Curriculum Rating:</label>
@@ -613,7 +668,7 @@ const GetStarted = () => {
               </>
             );
 
-          case 3:
+          case 4:
             return (
               <>
                 <label htmlFor="instructorRating">Instructor Rating:</label>
@@ -626,7 +681,7 @@ const GetStarted = () => {
                 />
               </>
             );
-          case 4:
+          case 5:
             return (
               <>
                 <label htmlFor="supportRating">Support and Resources Rating:</label>
@@ -639,7 +694,7 @@ const GetStarted = () => {
                 />
               </>
             );
-          case 5:
+          case 6:
             return (
               <>
                 <label htmlFor="overallRating">Overall Rating:</label>
@@ -665,7 +720,7 @@ const GetStarted = () => {
         return null;
     }
   };
-  const totalSteps = userData.me.userStatus === 'potential' ? 2 : userData.me.userStatus === 'current' ? 2 : 6;
+  const totalSteps = userData.me.userStatus === 'potential' ? 2 : userData.me.userStatus === 'current' ? 3 : 7;
 
   return (
     <div className={styles.getStarted}>
@@ -688,8 +743,8 @@ const GetStarted = () => {
               type="button"
               onClick={handleNext}
               disabled={
-                (step === 1 && bootcampProviderId === 'other' && !providerCreated) ||
-                (step === 5 && !courseCreated)
+                (step === 2 && bootcampProviderId === 'other' && !providerCreated) ||
+                (step === 6 && !courseCreated)
               }
             >
               Next

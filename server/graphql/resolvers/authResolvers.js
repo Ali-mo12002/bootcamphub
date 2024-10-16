@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs');
-const { signToken } = require('../../utils/auth');
+const { signToken, AuthenticationError } = require('../../utils/auth');
 const User = require('../../models/User');
 const Provider = require('../../models/Provider');
 const Course = require('../../models/Course');
@@ -102,30 +102,90 @@ const authResolvers = {
           ]);
         }
 
-        return recommendedPeople;
+        // Convert recommendedPeople to plain objects
+        return recommendedPeople.map(person => {
+          // Ensure the person is a Mongoose document
+          const plainPerson = person.toObject ? person.toObject() : person;
+          return {
+            ...plainPerson,
+            id: plainPerson._id.toString(), // Convert _id to string
+            followers: plainPerson.followers.map(follower => {
+              // Ensure each follower is a Mongoose document
+              const plainFollower = follower.toObject ? follower.toObject() : follower;
+              return {
+                ...plainFollower,
+                id: plainFollower._id.toString(), // Convert _id to string
+              };
+            })
+          };
+        });
       } catch (error) {
         console.error('Error fetching recommended people:', error);
         throw new Error('Failed to fetch recommended people');
       }
     },
-  
+    getNetworkPosts: async (_, { userId }) => {
+      try {
+        const user = await User.findById(userId).populate('following');
+        if (!user) throw new Error('User not found');
+
+        const followingIds = user.following.map(followedUser => followedUser.username);
+
+        const posts = await Post.find({
+          creatorName: { $in: followingIds },
+        })
+          .sort({ createdAt: -1 })
+          .populate('creatorName')
+          .populate({
+            path: 'comments',
+            populate: { path: 'replies' },
+          });
+          console.log(posts);
+        return posts;
+      } catch (error) {
+        throw new Error(error);
+      }
+    },
+    userProfile: async (_, { userId }) => {
+      const user = await User.findById(userId)
+        .populate('followers')
+        .populate('following');
+      return {
+        ...user.toObject(),
+        id: user._id.toString(), // Convert _id to string
+        followers: user.followers.map(follower => ({
+          ...follower.toObject(),
+          id: follower._id.toString() // Convert _id to string
+        })),
+        following: user.following.map(following => ({
+          ...following.toObject(),
+          id: following._id.toString() // Convert _id to string
+        }))
+      };
+    }
   },
   Mutation: {
     register: async (_, { registerInput: { username, email, password, userStatus } }) => {
       try {
+        // Check if the user already exists
         const userExists = await User.findOne({ email });
         if (userExists) {
           throw new Error('User already exists');
         }
-
-        const hashedPassword = await bcrypt.hash(password, 12); // Hash the password before saving
-        const user = await User.create({
+    
+        // Create a new user instance with the plain text password
+        const user = new User({
           username,
           email,
-          password: hashedPassword,
+          password, // Pass the plain text password here
           userStatus,
+          hasCompletedOnboarding: false,
         });
-
+    
+        // Save the user, which will trigger the 'pre-save' hook to hash the password
+        await user.save();
+    
+        // Generate a token for the user
         const token = signToken(user);
         return { token, user };
       } catch (error) {
@@ -133,18 +193,27 @@ const authResolvers = {
         throw new Error('Registration failed');
       }
     },
+    
     login: async (_, { loginInput: { email, password } }) => {
       try {
+        // Find the user by email
         const user = await User.findOne({ email });
         if (!user) {
-          throw new Error('Invalid email or password');
+          throw new Error('Invalid email');
         }
+        
+        console.log("Plain password:", password);
+        console.log("Stored hashed password:", user.password);
 
-        const isMatch = await bcrypt.compare(password, user.password);
+        // Use the matchPassword method from the User model to compare passwords
+        const isMatch = await user.matchPassword(password);
+        console.log("Password match:", isMatch);
+
         if (!isMatch) {
-          throw new Error('Invalid email or password');
+          throw new Error('Invalid password');
         }
 
+        // Generate a token for the user
         const token = signToken(user);
         return { token, user };
       } catch (error) {
@@ -152,6 +221,7 @@ const authResolvers = {
         throw new Error('Login failed');
       }
     },
+    
     createProvider: async (_, { input: { name, location, website } }) => {
       try {
         let provider = await Provider.findOne({ name });
@@ -205,13 +275,15 @@ const authResolvers = {
         throw new AuthenticationError('Authentication required');
       }
 
-      const { city, interested } = onboardingInput;
+      const { interested } = onboardingInput;
       const updatedUser = await User.findByIdAndUpdate(
         user._id,
-        { city, interested },
+        {
+          interested,
+          hasCompletedOnboarding: true, // Ensure onboarding is marked as complete
+        },
         { new: true }
       );
-
       if (!updatedUser) {
         throw new Error('User not found');
       }
@@ -313,6 +385,63 @@ const authResolvers = {
       await reply.save();
       return reply;
     },
+    followUser: async (_, { userIdToFollow }, { user }) => {
+        if (!user) {
+          throw new AuthenticationError('You need to be logged in');
+        }
+  
+        const currentUser = await User.findById(user._id);
+        const userToFollow = await User.findById(userIdToFollow);
+  
+        if (!userToFollow) {
+          throw new Error('User to follow not found');
+        }
+  
+        // Check if already following
+        if (currentUser.following.includes(userIdToFollow)) {
+          throw new Error('Already following this user');
+        }
+  
+        // Add to following and followers
+        currentUser.following.push(userIdToFollow);
+        userToFollow.followers.push(user._id);
+  
+        await currentUser.save();
+        await userToFollow.save();
+  
+        // Return the updated user details, including `username` and `following`
+        return {
+          id: currentUser._id.toString(),
+          username: currentUser.username,
+        };
+      },
+    
+    unfollowUser: async (_, { userIdToUnfollow }, { user }) => {
+      if (!user) {
+        throw new AuthenticationError('You need to be logged in');
+      }
+      
+      const currentUser = await User.findById(user._id);
+      const userToUnfollow = await User.findById(userIdToUnfollow);
+
+      if (!userToUnfollow) {
+        throw new Error('User not found');
+      }
+
+      if (!currentUser.following.includes(userIdToUnfollow)) {
+        throw new Error('You do not follow this user');
+      }
+
+      currentUser.following = currentUser.following.filter(id => id.toString() !== userIdToUnfollow.toString());
+      userToUnfollow.followers = userToUnfollow.followers.filter(id => id.toString() !== user._id.toString());
+
+      await currentUser.save();
+      await userToUnfollow.save();
+
+      return {
+        id: currentUser._id.toString(),
+        username: currentUser.username,
+      };    }
   }
 };
 

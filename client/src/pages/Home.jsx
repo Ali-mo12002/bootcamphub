@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
-import styles from '../styles/home.module.css'; // CSS Modules
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // Use useNavigate instead of useHistory
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { FaRegCommentAlt } from "react-icons/fa";
@@ -10,18 +9,20 @@ import Auth from '../utils/auth'; // Adjust the path based on your project struc
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 import { CREATE_POST, LIKE_POST } from '../utils/mutations'; // Import GraphQL operations
-import { GET_POSTS } from '../utils/queries'; // Import GraphQL operations
+import { GET_POSTS, GET_PROFILE } from '../utils/queries'; // Import GraphQL operations
 import { formatDistanceToNow } from 'date-fns';
+import styles from '../styles/home.module.css'; // CSS Modules
 
-// Additional component for displaying posts
+// Format date utility
 const formatDate = (timestamp) => {
   const date = new Date(parseInt(timestamp));
   return date.toLocaleString(); // You can format the date string as needed
 };
+
 const Post = ({ post }) => {
   const userId = Auth.loggedIn() ? Auth.getProfile().data._id : null;
   const [likePost] = useMutation(LIKE_POST, {
-    refetchQueries: ['GetPosts'],
+    refetchQueries: [{ query: GET_POSTS }],
   });
 
   const handleLike = async () => {
@@ -52,10 +53,10 @@ const Post = ({ post }) => {
         <p className={styles.commentLength}>{post.comments.length}</p>
         <p className={styles.date}>{formatDistanceToNow(new Date(parseInt(post.createdAt)))} ago</p>
       </div>
-      
     </div>
   );
 };
+
 const Home = () => {
   const [potentialVisible, setPotentialVisible] = useState(false);
   const [currentVisible, setCurrentVisible] = useState(false);
@@ -64,7 +65,16 @@ const Home = () => {
   const [createPost] = useMutation(CREATE_POST, {
     refetchQueries: [{ query: GET_POSTS }],
   });
+  const isLoggedIn = Auth.loggedIn();
+
+    const { loading: Profileloading, error: profileerror, data: profiledata } = useQuery(GET_PROFILE, {
+      skip: !isLoggedIn, // Skip the query if not logged in
+    
+    });
+
   const { loading, error, data } = useQuery(GET_POSTS);
+
+  const navigate = useNavigate(); // Use useNavigate for redirection
 
   const togglePotential = () => setPotentialVisible(!potentialVisible);
   const toggleCurrent = () => setCurrentVisible(!currentVisible);
@@ -76,12 +86,20 @@ const Home = () => {
   };
 
   let username = '';
-  if (Auth.loggedIn() === true) {
+  let hasCompletedOnboarding = true; // Default to true
+
+  if (Auth.loggedIn()) {
     const user = Auth.getProfile();
     username = user.data.username;
+    console.log(user.data);
   }
+  const profileData = profiledata
+  if (profileData && profileData.me) {
+    hasCompletedOnboarding = profileData.me.hasCompletedOnboarding
+    console.log(profileData.me.hasCompletedOnboarding);
+} 
 
-  const handlePostSubmit = async (e) => {
+const handlePostSubmit = async (e) => {
     e.preventDefault();
     try {
       await createPost({ variables: { creatorName: username, content } });
@@ -90,9 +108,18 @@ const Home = () => {
       console.error('Error creating post:', error);
     }
   };
+  
+  // Redirect to onboarding if logged in but not completed onboarding
+  useEffect(() => {
+    if (Auth.loggedIn() && !hasCompletedOnboarding) {
+      navigate('/getting-started'); // Use navigate to redirect
+    }
+  }, [hasCompletedOnboarding, navigate]);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
+  if (Profileloading) return <p>Loading...</p>;
+  if (profileerror) return <p>Error: {profileerror.message}</p>;
 
   return (
     <div className={styles.home}>

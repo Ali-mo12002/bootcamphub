@@ -11,6 +11,9 @@ const authTypeDefs = gql`
     token: String
     city: String               # Optional field
     interested: [String!]      # Optional field
+    hasCompletedOnboarding: Boolean! # Add this field
+    followers: [User]
+    following: [User]
   }
 
   type Provider {
@@ -73,8 +76,12 @@ const authTypeDefs = gql`
 
   input OnboardingInput {    
     id: ID!
-    city: String!
     interested: [String!]!
+  }
+
+  input UpdateCityInput {
+    id: ID!
+    city: String!
   }
 
   type Post {
@@ -87,15 +94,15 @@ const authTypeDefs = gql`
   }
 
   type Comment {
-  id: ID!
-  creatorName: String!
-  createdAt: String!
-  content: String!
-  postId: ID!          # Ensure this is non-nullable
-  parentCommentId: ID
-  replies: [Comment!]!
-  likes: [ID!]!
-}
+    id: ID!
+    creatorName: String!
+    createdAt: String!
+    content: String!
+    postId: ID!          # Ensure this is non-nullable
+    parentCommentId: ID
+    replies: [Comment!]!
+    likes: [ID!]!
+  }
 
   type Query {
     me: User
@@ -103,8 +110,10 @@ const authTypeDefs = gql`
     getCoursesByProvider(providerId: ID!): [Course]!
     posts: [Post!]!
     post(id: ID!): Post
-      getCommentReplies(commentId: ID!): Comment
-  getRecommendedPeople(userId: ID!): [User]
+    getCommentReplies(commentId: ID!): Comment
+    getRecommendedPeople(userId: ID!): [User]
+    userProfile(userId: ID!): User
+      getNetworkPosts(userId: ID!): [Post!]!
 
   }
 
@@ -114,7 +123,7 @@ const authTypeDefs = gql`
     likePost(postId: ID!): Post!
     replyComment(creatorName: String!, content: String!, commentId: ID!): Comment!
     likeComment(commentId: ID!, userId: ID!): Comment!
-      likeReply(commentId: ID!, userId: ID!): Comment!
+    likeReply(commentId: ID!, userId: ID!): Comment!
     register(registerInput: RegisterInput): User!
     createProvider(input: ProviderInput!): Provider!
     createCourse(input: CourseInput!): Course!
@@ -122,6 +131,9 @@ const authTypeDefs = gql`
     updateGradInfo(updateGradInfoInput: UpdateGradInfoInput): User!
     submitReview(courseId: ID!, curriculumRating: Int!, instructorRating: Int!, supportRating: Int!, overallRating: Int, feedback: String!): Review
     completeOnboarding(onboardingInput: OnboardingInput!): User!
+  updateCity(updateCityInput: UpdateCityInput!): User!
+  followUser(userIdToFollow: ID!): User
+  unfollowUser(userIdToUnfollow: ID!): User
   }
 `;
 

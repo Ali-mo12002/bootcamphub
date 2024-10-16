@@ -32,6 +32,18 @@ const UserSchema = new mongoose.Schema({
   interested: {
     type: [String], // Assuming 'interested' is an array of interests
   },
+  hasCompletedOnboarding: {
+    type: Boolean,
+    default: false,  // New users haven't completed onboarding
+  },
+  following: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }],
+  followers: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }],
 });
 
 UserSchema.pre('save', async function (next) {

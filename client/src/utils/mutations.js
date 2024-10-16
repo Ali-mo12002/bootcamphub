@@ -50,6 +50,16 @@ export const UPDATE_GRAD_INFO = gql`
     }
   }
 `;
+export const UPDATE_CITY_MUTATION = gql`
+  mutation UpdateCity($updateCityInput: UpdateCityInput!) {
+  updateCity(updateCityInput: $updateCityInput) {
+    id
+    city
+    hasCompletedOnboarding
+
+  }
+}
+`;
 
 export const SUBMIT_REVIEW = gql`
   mutation SubmitReview($courseId: ID!, $curriculumRating: Int!, $instructorRating: Int!, $supportRating: Int!, $overallRating: Int, $feedback: String!) {
@@ -66,10 +76,10 @@ export const SUBMIT_REVIEW = gql`
 `;
 
 export const COMPLETE_ONBOARDING = gql`
-  mutation CompleteOnboarding($id: ID!, $city: String!, $interested: [String!]!) {
-    completeOnboarding(onboardingInput: { id: $id, city: $city, interested: $interested }) {
+  mutation CompleteOnboarding($id: ID!, $interested: [String!]!) {
+    completeOnboarding(onboardingInput: { id: $id,interested: $interested }) {
       id
-      city
+      
       interested
     }
   }
@@ -137,6 +147,25 @@ export const LIKE_REPLY = gql`
     likeReply(commentId: $commentId, userId: $userId) {
       id
       likes 
+    }
+  }
+`;
+
+export const FOLLOW_USER = gql`
+  mutation FollowUser($userIdToFollow: ID!) {
+    followUser(userIdToFollow: $userIdToFollow) {
+      id
+      username
+    }
+  }
+`;
+
+export const UNFOLLOW_USER = gql`
+  mutation UnfollowUser($userIdToUnfollow: ID!) {
+    unfollowUser(userIdToUnfollow: $userIdToUnfollow) {
+      id
+      username
+      
     }
   }
 `;

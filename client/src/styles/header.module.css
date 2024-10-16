@@ -31,21 +31,27 @@
     text-decoration: none;
     background-color: #242424;
   }
- 
-  .dropdownItem{
+  .dropdown{
+    z-index: 1000;
+  }
+  .dropdownItem:hover{
     text-decoration: none;
-    
 
   }
+
   nav  button{
     background-color: #2a2a2a;
   }
 nav ul button{
   margin-bottom: 8px;
-  background-color: #2a2a2a;
   border: none;
   background-color: #242424; 
+  cursor: pointer;
 }
+nav ul button:focus {
+outline: none;
+}
+
  nav ul{
   padding: 10px ;
   background-color: #2a2a2a;

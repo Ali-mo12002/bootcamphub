@@ -6,6 +6,7 @@ export const GET_USER = gql`
       id
       username
       userStatus
+      hasCompletedOnboarding
     }
   }
 `;
@@ -107,6 +108,65 @@ export const GET_RECOMMENDED_PEOPLE = gql`
       username
       graduationDate
       city
+      followers {
+        id
+        
+      }
+    }
+  }
+`;
+
+
+export const GET_PROFILE = gql`
+  query GetProfile {
+    me {
+      id
+      username
+      city
+      hasCompletedOnboarding
+    }
+  }
+`;
+export const GET_USER_PROFILE = gql`
+  query GetUserProfile($userId: ID!) {
+    userProfile(userId: $userId) {
+      id
+      username
+      followers {
+        id
+        username
+      }
+      following {
+        id
+        username
+      }
+    }
+  }
+`;
+
+export const GET_NETWORK_POSTS = gql`
+  query GetNetworkPosts($userId: ID!) {
+    getNetworkPosts(userId: $userId) {
+        comments {
+          content
+          createdAt
+          creatorName
+          id
+          
+          replies {
+            content
+            createdAt
+            creatorName
+            id
+            postId
+          }
+        }
+        content
+        createdAt
+        creatorName
+        id
+        likes
+      
     }
   }
 `;
