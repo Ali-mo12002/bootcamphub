@@ -260,15 +260,44 @@ const authResolvers = {
         {
           graduationDate,
           courseId,
+          hasCompletedOnboarding: true, // Ensure onboarding is marked as complete
+
         },
         { new: true }
       );
-    
+      console.log(updatedUser)
       if (!updatedUser) {
         throw new Error('User not found or update failed.');
       }
     
       return updatedUser;
+    },
+    updateCity: async (_, { updateCityInput }) => {
+      const { id, city } = updateCityInput;
+
+      try {
+        // Find the user by ID and update the city
+        const updatedUser = await User.findByIdAndUpdate(
+          id, // User ID to update
+        {
+          city , // Update the 'city' field
+          hasCompletedOnboarding: true, // Ensure onboarding is marked as complete
+
+        },
+        { new: true } // Return the updated user object
+        );
+
+        // If the user is not found, throw an error
+        if (!updatedUser) {
+          throw new Error('User not found or could not be updated');
+        }
+
+        // Return the updated user with the new city
+        return updatedUser;
+      } catch (error) {
+        console.error('Error updating city:', error);
+        throw new Error('Failed to update city');
+      }
     },
     completeOnboarding: async(_, { onboardingInput }, { user }) => {
       if (!user) {
@@ -280,8 +309,8 @@ const authResolvers = {
         user._id,
         {
           interested,
-          hasCompletedOnboarding: true, // Ensure onboarding is marked as complete
-        },
+         hasCompletedOnboarding: true, // Ensure onboarding is marked as complete
+         },
         { new: true }
       );
       if (!updatedUser) {

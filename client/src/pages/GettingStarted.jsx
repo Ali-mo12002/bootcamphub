@@ -141,7 +141,8 @@ const GetStarted = () => {
     if (event) {
       event.preventDefault(); // Check if event is defined before using it
     }
-    console.log(graduationDate);
+
+    console.log('graduationDate');
     console.log(userData.me);
     console.log(bootcampId);
     console.log(city);
@@ -164,7 +165,10 @@ const GetStarted = () => {
       });
 
       console.log('Updated grad info:', result.data.updateGradInfo);
-      navigate('/')
+      if(userData.me.hasCompletedOnboarding === true){
+        console.log('hello');
+        navigate('/');
+      }
       // After updating grad info, proceed to review submission
     } catch (error) {
       console.error('Error updating grad info:', error);
@@ -190,7 +194,7 @@ const GetStarted = () => {
       });
       console.log('Onboarding completed:', result.data.completeOnboarding);
       navigate('/');
-
+      console.log('completed')
     } catch (error) {
       console.error('Error completing onboarding:', error);
     }
