@@ -91,6 +91,21 @@ const authTypeDefs = gql`
     content: String!
     likes: [ID!]!
     comments: [Comment!]!
+    title: String
+    link: String
+    image: String
+    description: String
+    isProject: Boolean!  
+  }
+
+  input CreateShowcaseInput {
+    creatorName: String!
+    content: String!
+    title: String
+    link: String
+    image: String
+    description: String
+    isProject: Boolean!  
   }
 
   type Comment {
@@ -133,6 +148,7 @@ const authTypeDefs = gql`
     completeOnboarding(onboardingInput: OnboardingInput!): User!
   updateCity(updateCityInput: UpdateCityInput!): User!
   followUser(userIdToFollow: ID!): User
+    newShowcase(input: CreateShowcaseInput!): Post
   unfollowUser(userIdToUnfollow: ID!): User
   }
 `;

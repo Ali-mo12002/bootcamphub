@@ -44,10 +44,18 @@ const authResolvers = {
         throw new Error(`Failed to fetch courses: ${error.message}`);
       }
     },
-    posts: async () => await Post.find().populate({
-      path: 'comments',
-      populate: { path: 'replies' }
-    }),
+    posts: async () => {
+      try {
+        // Fetch posts with isProject set to false
+        const posts = await Post.find({ isProject: false }).populate({
+          path: 'comments',
+          populate: { path: 'replies' }
+        });
+        return posts;
+      } catch (error) {
+        throw new Error(`Failed to fetch posts: ${error.message}`);
+      }
+    },
     post: async (_, { id }) => await Post.findById(id).populate({
       path: 'comments',
       populate: { path: 'replies' }
@@ -334,6 +342,26 @@ const authResolvers = {
     createPost: async (_, { creatorName, content }) => {
       const newPost = new Post({ creatorName, content });
       return await newPost.save();
+    },
+    newShowcase: async (_, { input }) => {
+      try {
+        const { title, link, image, description, content, creatorName, isProject } = input;
+
+        // Create the showcase post using the required fields
+        const newShowcasePost = await Post.create({
+          title,
+          link,
+          image,
+          content, // Ensure content is passed
+          creatorName, // Ensure creatorName is passed
+          description,
+          isProject,
+        });
+
+        return newShowcasePost;
+      } catch (error) {
+        throw new Error(`Failed to create showcase: ${error.message}`);
+      }
     },
     likePost: async (_, { postId }, { user }) => {
       if (!user) {

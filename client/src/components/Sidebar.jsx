@@ -15,6 +15,9 @@ const Sidebars = () => {
             <Sidebar.Item href="/network" icon={HiViewBoards} className={styles.sidebaritem}>
               Network
             </Sidebar.Item>
+            <Sidebar.Item href="/showcase" icon={HiInbox} className={styles.sidebaritem}>
+              Showcase
+            </Sidebar.Item>
             <Sidebar.Item href="#" icon={HiInbox} className={styles.sidebaritem}>
               Job Postings
             </Sidebar.Item>

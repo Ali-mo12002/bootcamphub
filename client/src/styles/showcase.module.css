@@ -1,0 +1,15 @@
+.div{
+    display: flex;
+}
+.contentdiv{
+    width: 100%;
+    text-align: center;
+}
+.createbtncontainer{
+    display: flex;
+    justify-content: end;
+}
+.createbtn{
+    width: 15%;
+    margin-right: 15px;
+}

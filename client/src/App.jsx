@@ -9,6 +9,7 @@ import Register from './pages/Register'; // Placeholder for Register page
 import Footer from './components/Footer'; // Optional: Create Footer component
 import GettingStarted from './pages/GettingStarted';
 import PostDetail from './pages/Post'
+import Showcase from './pages/Showcase'
 import { setContext } from "@apollo/client/link/context";
 import Network from './pages/Network'
 
@@ -43,7 +44,7 @@ const App = () => {
           <Route path="/getting-started" element={<GettingStarted />} />
           <Route path="/post/:postId" element={<PostDetail />} /> 
           <Route path="/network" element={<Network />} />
-
+          <Route path="/showcase" element={<Showcase />} />
         </Routes>
         <Footer /> {/* Optional: Include Footer component */}
       </div>

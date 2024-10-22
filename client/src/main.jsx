@@ -6,6 +6,7 @@ import App from './App.jsx';
 import './index.css';
 import Home from './pages/Home';
 import Bootcamps from './pages/Bootcamps'; 
+import Showcase from './pages/Showcase'; 
 import Login from './pages/Login'; 
 import Register from './pages/Register'; 
 import GettingStarted from './pages/GettingStarted';
@@ -40,6 +41,10 @@ const router = createBrowserRouter([
       {
         path: '/network',
         element: <Network />
+      },
+      {
+        path: '/showcase',
+        element: <Showcase />
       },
       {
         path: '/post/:postId', // Route for specific post
