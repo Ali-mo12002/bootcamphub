@@ -169,3 +169,19 @@ export const UNFOLLOW_USER = gql`
     }
   }
 `;
+
+
+
+export const NEW_SHOWCASE = gql`
+  mutation NewShowcase($input: CreateShowcaseInput!) {
+    newShowcase(input: $input) {
+      id
+      title
+      link
+      image
+      content
+      isProject
+      createdAt
+    }
+  }
+`;

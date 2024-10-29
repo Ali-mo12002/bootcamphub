@@ -17,6 +17,7 @@
         "concurrently": "^8.2.0"
     },
     "dependencies": {
-        "@apollo/client": "^3.10.6"
+        "@apollo/client": "^3.10.6",
+        "multer": "^1.4.5-lts.1"
     }
 }

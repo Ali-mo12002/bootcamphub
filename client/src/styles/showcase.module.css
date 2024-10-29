@@ -1,15 +1,132 @@
-.div{
+.div {
     display: flex;
 }
-.contentdiv{
+
+.contentdiv {
     width: 100%;
     text-align: center;
 }
-.createbtncontainer{
+
+.createbtncontainer {
     display: flex;
     justify-content: end;
 }
-.createbtn{
+
+.createbtn {
     width: 15%;
     margin-right: 15px;
+}
+
+.showcaseList {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px; /* Adds space between posts */
+    width: 100%;
+}
+
+.showcaseItem {
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    width: 80%;
+    position: relative;
+    overflow: hidden;
+    width: 90%;
+}
+
+.metadata {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.creator {
+    margin: 0;
+}
+
+.stats {
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    width: 20%;
+}
+
+.like {
+    width: 10%;
+    height: 30px;
+    padding: 4px 0;
+    margin: 0;
+    background-color: transparent;
+    font-size: 20px;
+    border: none;
+}
+
+.comment {
+    font-size: 20px;
+    margin: 0 3px;
+    width: 10%;
+}
+
+.commentLength {
+    font-size: 20px;
+    margin: 0 10px 0 0;
+}
+
+.likeCount {
+    font-size: 20px;
+    margin: 0 10px 0 0;
+}
+
+/* Image and Overlay */
+.imageContainer {
+    position: relative;
+}
+
+.showcaseImage {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(36, 36, 36, 0.9); /* Dark overlay with transparency */
+    opacity: 0;
+    color: rgba(255, 255, 255, 0.87);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px;
+    transition: opacity 0.3s ease;
+}
+
+/* Show overlay on hover */
+.imageContainer:hover .overlay {
+    opacity: 1;
+}
+
+.overlay .title {
+    align-self: flex-start;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.overlay .content {
+    flex: 1; /* Centered text in middle of overlay */
+    text-align: center;
+    padding: 10px 0;
+}
+
+.overlay .metadata {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding-top: 10px;
+    align-self: flex-end;
 }

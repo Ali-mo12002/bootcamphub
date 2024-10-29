@@ -124,12 +124,13 @@ const authTypeDefs = gql`
     getProviders: [Provider]!
     getCoursesByProvider(providerId: ID!): [Course]!
     posts: [Post!]!
+    showcasePosts: [Post!]!
     post(id: ID!): Post
     getCommentReplies(commentId: ID!): Comment
     getRecommendedPeople(userId: ID!): [User]
     userProfile(userId: ID!): User
       getNetworkPosts(userId: ID!): [Post!]!
-
+    
   }
 
   type Mutation {

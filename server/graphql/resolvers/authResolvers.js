@@ -170,7 +170,19 @@ const authResolvers = {
           id: following._id.toString() // Convert _id to string
         }))
       };
-    }
+    },
+    showcasePosts: async () => {
+      try {
+        // Fetch posts with isProject set to false
+        const posts = await Post.find({ isProject: true }).populate({
+          path: 'comments',
+          populate: { path: 'replies' }
+        });
+        return posts;
+      } catch (error) {
+        throw new Error(`Failed to fetch posts: ${error.message}`);
+      }
+    },
   },
   Mutation: {
     register: async (_, { registerInput: { username, email, password, userStatus } }) => {

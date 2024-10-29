@@ -4,6 +4,8 @@ const { ApolloServer } = require('apollo-server-express');
 const connectDB = require('./config/db');
 const { typeDefs, resolvers } = require('./graphql/schema');
 const { authMiddleware } = require('./utils/auth');
+const uploadRoutes = require('./routes/upload.js'); // Update path as needed
+const cors = require('cors');
 
 dotenv.config();
 
@@ -17,9 +19,13 @@ const server = new ApolloServer({
   context: authMiddleware
 });
 
-
 // Initialize Express app
 const app = express();
+app.use(cors({ origin: 'http://localhost:5173' }));
+
+app.use(express.json());
+app.use('/upload', uploadRoutes); // Mount the upload route
+app.use('/uploads', express.static('uploads')); // Serve uploaded images as static files
 
 // Apply ApolloServer middleware to Express app
 async function startServer() {

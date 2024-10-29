@@ -170,3 +170,33 @@ export const GET_NETWORK_POSTS = gql`
     }
   }
 `;
+
+export const GET_SHOWCASE_POSTS = gql`
+  query GetShowcasePosts {
+    showcasePosts {
+      id
+      creatorName
+      content
+      createdAt
+      title
+      link
+      image
+      description
+      isProject
+      likes
+      comments {
+        content
+        createdAt
+        creatorName
+        id
+        replies {
+          content
+          createdAt
+          creatorName
+          id
+          postId
+        }
+      }
+    }
+  }
+`;

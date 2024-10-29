@@ -216,7 +216,7 @@ border-radius: 5px; /* Optional: rounded corners */
   height: 30px;
   padding: 0;
   margin: 0;
-  background-color: #2b2a2a;
+  background-color: transparent;
   font-size: 20px;
   border: none; /* Ensure there's no border */
 }
